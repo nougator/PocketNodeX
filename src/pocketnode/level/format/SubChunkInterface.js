@@ -13,7 +13,7 @@
 const ClassHasMethod = require("../../utils/methods/ClassHasMethod");
 
 class SubChunkInterface {
-    constructor(){
+    constructor() {
         let methods = [
             "isEmpty",
             "getBlockId",
@@ -32,7 +32,7 @@ class SubChunkInterface {
         ];
 
         let missingMethods;
-        if((missingMethods = ClassHasMethod(this.constructor, methods)) !== true){
+        if ((missingMethods = ClassHasMethod(this.constructor, methods)) !== true) {
             throw new Error(this.constructor.name + " is missing the following method(s): " + missingMethods.join(", "));
         }
     }

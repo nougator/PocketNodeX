@@ -2,17 +2,17 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class SetTimePacket extends DataPacket {
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.SET_TIME_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.time = 0;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -27,4 +27,5 @@ class SetTimePacket extends DataPacket {
         return session.handleSetTime(this);
     }
 }
+
 module.exports = SetTimePacket;

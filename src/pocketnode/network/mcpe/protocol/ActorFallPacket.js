@@ -3,19 +3,19 @@ const ProtocolInfo = require("../Info");
 
 class ActorFallPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.ACTOR_FALL_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.entityRuntimeId = -1;
         this.fallDistance = -1;
         this.isInVoid = false;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -34,4 +34,5 @@ class ActorFallPacket extends DataPacket {
         return session.handleActorFall(this);
     }
 }
+
 module.exports = ActorFallPacket;

@@ -10,25 +10,26 @@
  *  @link https://pocketnode.me
 */
 const EventEmitter = require("events").EventEmitter;
+
 // const Event = require("./Event");
 
 class EventHandler extends EventEmitter {
 
-    constructor(server){
+    constructor(server) {
         super();
         this.server = server;
         this.emitter = new EventEmitter();
     }
 
-    callEvent(ev){
-        if(typeof ev !== "string" && typeof ev !== "number" && typeof ev !== "boolean" && typeof ev.isEvent !== null){
+    callEvent(ev) {
+        if (typeof ev !== "string" && typeof ev !== "number" && typeof ev !== "boolean" && typeof ev.isEvent !== null) {
             this.emitter.emit(ev.getEventName(), ev);
         } else {
             this.server.getLogger().error("Calling event '" + ev.toString() + "' with non Event object");
         }
     }
 
-    getEmitter(){
+    getEmitter() {
         return this.emitter;
     }
 

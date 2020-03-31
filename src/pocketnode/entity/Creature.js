@@ -1,8 +1,8 @@
 const Living = require("./Living");
 
-class Creature extends Living{
+class Creature extends Living {
 
-    constructor(server, nbt){
+    constructor(server, nbt) {
         super(server, nbt);
     }
 

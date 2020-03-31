@@ -3,11 +3,17 @@
 const ProtocolInfo = require("./network/mcpe/Info");
 const Config = require("./utils/Config");
 
+const UUID = require('./utils/UUID');
+const SkinAdapterSingleton = require('./network/mcpe/protocol/types/SkinAdapterSingleton');
+
 const PluginManager = require("./plugin/PluginManager");
 const SourcePluginLoader = require("./plugin/SourcePluginLoader");
 const ScriptPluginLoader = require("./plugin/ScriptPluginLoader");
 
 const Isset = require("./utils/methods/Isset");
+
+const PlayerListPacket = require('./network/mcpe/protocol/PlayerListPacket');
+const PlayerListEntry = require('./network/mcpe/protocol/types/PlayerListEntry');
 
 const RakNetAdapter = require("./network/RakNetAdapter");
 const BatchPacket = require("./network/mcpe/protocol/BatchPacket");
@@ -40,7 +46,110 @@ const SFS = require("./utils/SimpleFileSystem");
 
 class Server {
 
-    initVars(){
+    /** @type {Server | null} */
+    static _instance = null;
+
+    constructor(pocketnode, localizationManager, logger, paths) {
+        this.initVars();
+
+        if (Server._instance) {
+            throw Error('Server is a singleton. Please use `getInstance` method instead');
+        }
+
+        this._pocketnode = pocketnode;
+        this.localizationManager = localizationManager;
+
+        this._logger = logger;
+        this._paths = paths;
+
+        if (!SFS.dirExists(this.getDataPath() + "worlds/")) {
+            SFS.mkdir(this.getDataPath() + "worlds/");
+        }
+
+        if (!SFS.dirExists(this.getDataPath() + "players/")) {
+            SFS.mkdir(this.getDataPath() + "players/");
+        }
+
+        if (!SFS.dirExists(this._paths.plugins)) {
+            SFS.mkdir(this._paths.plugins);
+        }
+
+        this.getLogger().info(localizationManager.getPhrase("language"));
+        this.getLogger().info(localizationManager.getPhrase("starting-pocketnode").replace("{{name}}", this.getName()).replace("{{version}}", this.getVersion()));
+
+        this.getLogger().info(localizationManager.getPhrase("loading-properties"));
+        if (!SFS.fileExists(this._paths.data + "pocketnode.json")) {
+            SFS.copy(this._paths.file + "pocketnode/resources/pocketnode.json", this._paths.data + "pocketnode.json");
+        }
+        this._config = new Config(this.getDataPath() + "pocketnode.json", Config.JSON, {});
+        this._debuggingLevel = this._config.getNested("debugging.level", 0);
+
+        this.getLogger().setDebugging(this._debuggingLevel);
+
+        //this._scheduler
+
+        this._ops = new Config(this.getDataPath() + "ops.json", Config.JSON);
+        this._whitelist = new Config(this.getDataPath() + "whitelist.json", Config.JSON);
+        this._bannedNames = new Config(this.getDataPath() + "banned-names.json", Config.JSON);
+        this._bannedIps = new Config(this.getDataPath() + "banned-ips.json", Config.JSON);
+        this._maxPlayers = this._config.getNested("server.max-players", 20);
+        this._onlineMode = this._config.getNested("server.online-mode", true);
+
+        if (!TRAVIS_BUILD) process.stdout.write("\x1b]0;" + this.getName() + " " + this.getPocketNodeVersion() + "\x07");
+
+        this.getLogger().debug("Server Id:", this._serverID);
+
+        this.getLogger().info(localizationManager.getPhrase("starting-server").replace("{{ip}}", this.getIp()).replace("{{port}}", this.getPort()));
+
+        this._raknetAdapter = new RakNetAdapter(this);
+
+        this.getLogger().info("This server is running " + this.getName() + " version " + this.getPocketNodeVersion() + " \"" + this.getCodeName() + "\" (API " + this.getApiVersion() + ")");
+        this.getLogger().info(localizationManager.getPhrase("license"));
+
+        this.getLogger().info(localizationManager.getPhrase("done").replace("{{time}}", Date.now() - this._pocketnode.START_TIME));
+
+        this._commandMap = new CommandMap(this);
+        this.registerDefaultCommands();
+
+        this._consoleCommandReader = new ConsoleCommandReader(this);
+
+        this._resourcePackManager = new ResourcePackManager(this, this.getDataPath() + "resource_packs/");
+
+        this._pluginManager = new PluginManager(this);
+        this._pluginManager.registerLoader(SourcePluginLoader);
+        this._pluginManager.registerLoader(ScriptPluginLoader);
+        this._pluginManager.loadPlugins(this.getPluginPath());
+        this._pluginManager.enablePlugins(); //load order STARTUP
+
+        this._generatorManager = new GeneratorManager();
+        this._generatorManager.addGenerator("flat", FlatGenerator);
+        if (this.getDefaultLevel() === null) {
+            this._defaultLevel = new Level(this);
+        }
+
+        Entity.init();
+
+        //enable plugins POSTWORLD
+
+        this.start();
+    }
+
+    static getGamemodeName(mode) {
+        switch (mode) {
+            case Player.SURVIVAL:
+                return "Survival";
+            case Player.CREATIVE:
+                return "Creative";
+            case Player.ADVENTURE:
+                return "Adventure";
+            case Player.SPECTATOR:
+                return "Spectator";
+            default:
+                return "Unknown";
+        }
+    }
+
+    initVars() {
 
         this._instance = null;
 
@@ -117,7 +226,7 @@ class Server {
         this._baseLang = null;
         this._forceLanguage = false;
 
-        this._serverID = Math.floor((Math.random() * 99999999)+1);
+        this._serverID = Math.floor((Math.random() * 99999999) + 1);
 
         this._queryRegenerateTask = null;
 
@@ -147,7 +256,7 @@ class Server {
 
         this._players = new PlayerList();
         this._loggedInPlayers = new PlayerList();
-        this._playerList = new PlayerList();
+        this._playerList = [];
 
         this._eventSystem = new EventHandler(this);
 
@@ -160,94 +269,13 @@ class Server {
         this._localizationManager = null;
     }
 
-    constructor(pocketnode, localizationManager, logger, paths){
-        this.initVars();
-
-        this._pocketnode = pocketnode;
-        this.localizationManager = localizationManager;
-
-        this._logger = logger;
-        this._paths = paths;
-
-        if(!SFS.dirExists(this.getDataPath() + "worlds/")){
-            SFS.mkdir(this.getDataPath() + "worlds/");
-        }
-
-        if(!SFS.dirExists(this.getDataPath() + "players/")){
-            SFS.mkdir(this.getDataPath() + "players/");
-        }
-
-        if(!SFS.dirExists(this._paths.plugins)){
-            SFS.mkdir(this._paths.plugins);
-        }
-
-        this.getLogger().info(localizationManager.getPhrase("language"));
-        this.getLogger().info(localizationManager.getPhrase("starting-pocketnode").replace("{{name}}", this.getName()).replace("{{version}}", this.getVersion()));
-
-        this.getLogger().info(localizationManager.getPhrase("loading-properties"));
-        if(!SFS.fileExists(this._paths.data + "pocketnode.json")){
-            SFS.copy(this._paths.file + "pocketnode/resources/pocketnode.json", this._paths.data + "pocketnode.json");
-        }
-        this._config = new Config(this.getDataPath() + "pocketnode.json", Config.JSON, {});
-        this._debuggingLevel = this._config.getNested("debugging.level", 0);
-
-        this.getLogger().setDebugging(this._debuggingLevel);
-
-        //this._scheduler
-
-        this._ops = new Config(this.getDataPath() + "ops.json", Config.JSON);
-        this._whitelist = new Config(this.getDataPath() + "whitelist.json", Config.JSON);
-        this._bannedNames = new Config(this.getDataPath() + "banned-names.json", Config.JSON);
-        this._bannedIps = new Config(this.getDataPath() + "banned-ips.json", Config.JSON);
-        this._maxPlayers = this._config.getNested("server.max-players", 20);
-        this._onlineMode = this._config.getNested("server.online-mode", true);
-
-        if(!TRAVIS_BUILD) process.stdout.write("\x1b]0;" + this.getName() + " " + this.getPocketNodeVersion() + "\x07");
-
-        this.getLogger().debug("Server Id:", this._serverID);
-
-        this.getLogger().info(localizationManager.getPhrase("starting-server").replace("{{ip}}", this.getIp()).replace("{{port}}", this.getPort()));
-
-        this._raknetAdapter = new RakNetAdapter(this);
-
-        this.getLogger().info("This server is running " + this.getName() + " version " + this.getPocketNodeVersion() + " \"" + this.getCodeName() + "\" (API " + this.getApiVersion() + ")");
-        this.getLogger().info(localizationManager.getPhrase("license"));
-
-        this.getLogger().info(localizationManager.getPhrase("done").replace("{{time}}", Date.now() - this._pocketnode.START_TIME));
-
-        this._commandMap = new CommandMap(this);
-        this.registerDefaultCommands();
-
-        this._consoleCommandReader = new ConsoleCommandReader(this);
-
-        this._resourcePackManager = new ResourcePackManager(this, this.getDataPath() + "resource_packs/");
-
-        this._pluginManager = new PluginManager(this);
-        this._pluginManager.registerLoader(SourcePluginLoader);
-        this._pluginManager.registerLoader(ScriptPluginLoader);
-        this._pluginManager.loadPlugins(this.getPluginPath());
-        this._pluginManager.enablePlugins(); //load order STARTUP
-
-        this._generatorManager = new GeneratorManager();
-        this._generatorManager.addGenerator("flat", FlatGenerator);
-        if(this.getDefaultLevel() === null){
-            this._defaultLevel = new Level(this);
-        }
-
-        Entity.init();
-
-        //enable plugins POSTWORLD
-
-        this.start();
-    }
-
-    start(){
+    start() {
 
         //block banned ips
 
         this._tickCounter = 0;
 
-        this.getLogger().info("Done ("+(Date.now() - this._pocketnode.START_TIME)+"ms)!");
+        this.getLogger().info("Done (" + (Date.now() - this._pocketnode.START_TIME) + "ms)!");
 
         this.tickProcessor();
         RuntimeBlockMapping.init();
@@ -255,7 +283,7 @@ class Server {
     }
 
     //By twsited & jackx, this hack is nice.
-    registerDefaultCommands(){
+    registerDefaultCommands() {
         let dir = __dirname + '/command/defaults';
         const commands = SFS.readDir(dir);
         commands.forEach(defaultCommand => {
@@ -267,12 +295,12 @@ class Server {
     /**
      * @return {boolean}
      */
-    isRunning(){
+    isRunning() {
         return this._isRunning;
     }
 
-    shutdown(){
-        if(!this._isRunning) return;
+    shutdown() {
+        if (!this._isRunning) return;
 
         this.getLogger().info("Shutting down...");
         this._raknetAdapter.shutdown();
@@ -286,73 +314,75 @@ class Server {
     /**
      * @return {string}
      */
-    getName(){
+    getName() {
         return this._pocketnode.NAME;
     }
 
     /**
      * @return {string}
      */
-    getCodeName(){
+    getCodeName() {
         return this._pocketnode.CODENAME;
     }
 
     /**
      * @return {string}
      */
-    getPocketNodeVersion(){
+    getPocketNodeVersion() {
         return this._pocketnode.VERSION;
     }
 
     /**
      * @return {string}
      */
-    getVersion(){
+    getVersion() {
         return ProtocolInfo.VERSION;
     }
 
     /**
      * @return {number}
      */
-    getProtocol(){
+    getProtocol() {
         return ProtocolInfo.PROTOCOL;
     }
 
     /**
      * @return {string}
      */
-    getApiVersion(){
+    getApiVersion() {
         return this._pocketnode.API_VERSION;
     }
 
     /**
      * @return {CommandMap}
      */
-    getCommandMap(){
+    getCommandMap() {
         return this._commandMap;
     }
 
-    getPluginManager(){
+    getPluginManager() {
         return this._pluginManager;
     }
 
     /**
      * @return {string}
      */
-    getDataPath(){
+    getDataPath() {
         return this._paths.data;
     }
-    getFilePath(){
+
+    getFilePath() {
         return this._paths.file;
     }
-    getPluginPath(){
+
+    getPluginPath() {
         return this._paths.plugins;
     }
 
     /**
      * @return {number}
      */
-    getMaxPlayers(){
+    getMaxPlayers() {
         return this._maxPlayers;
     }
 
@@ -361,7 +391,7 @@ class Server {
      *
      * @return {boolean}
      */
-    getOnlineMode(){
+    getOnlineMode() {
         return this._onlineMode;
     }
 
@@ -370,92 +400,92 @@ class Server {
      *
      * @return {boolean}
      */
-    requiresAuthentication(){
+    requiresAuthentication() {
         return this.getOnlineMode();
     }
 
     /**
      * @return {string}
      */
-    getIp(){
+    getIp() {
         return this._config.getNested("server.ip", "0.0.0.0");
     }
 
     /**
      * @return {number}
      */
-    getPort(){
+    getPort() {
         return this._config.getNested("server.port", 19132);
     }
 
     /**
      * @return {number}
      */
-    getServerId(){
+    getServerId() {
         return this._serverID;
     }
 
-    getGamemode(){
+    getGamemode() {
         return this._config.getNested("server.gamemode", 1);
     }
 
     /**
      * @return {boolean}
      */
-    hasWhitelist(){
+    hasWhitelist() {
         return this._config.getNested("server.whitelist", false);
     }
 
     /**
      * @return {string}
      */
-    getMotd(){
+    getMotd() {
         return this._config.getNested("server.motd", this._pocketnode.NAME + " Server");
     }
 
     /**
      * @return {Logger}
      */
-    getLogger(){
+    getLogger() {
         return this._logger;
     }
 
     /**
      * @return {Array}
      */
-    getOnlinePlayers(){
+    getOnlinePlayers() {
         return Array.from(this._playerList.values());
     }
 
     /**
      * @return {Array}
      */
-    getLoggedInPlayers(){
+    getLoggedInPlayers() {
         return Array.from(this._loggedInPlayers.values());
     }
 
     /**
      * @return {number}
      */
-    getOnlinePlayerCount(){
+    getOnlinePlayerCount() {
         return this.getOnlinePlayers().length;
     }
 
     /**
      * @return {boolean}
      */
-    isFull(){
+    isFull() {
         return this.getOnlinePlayerCount() === this.getMaxPlayers();
     }
 
     /**
      * @return {ResourcePackManager}
      */
-    getResourcePackManager(){
+    getResourcePackManager() {
         return this._resourcePackManager;
     }
 
-    broadcastMessage(message, recipients = this.getOnlinePlayers()){
+    broadcastMessage(message, recipients = this.getOnlinePlayers()) {
         recipients.forEach(recipient => recipient.sendMessage(message));
 
         return recipients.length;
@@ -465,20 +495,20 @@ class Server {
      * @param name {string}
      * @return {Player}
      */
-    getPlayer(name){
+    getPlayer(name) {
         name = name.toLowerCase();
 
         let found = null;
         let delta = 20; // estimate nametag length
 
-        for(let [username, player] of this._playerList){
-            if(username.indexOf(name) === 0){
+        for (let [username, player] of this._playerList) {
+            if (username.indexOf(name) === 0) {
                 let curDelta = username.length - name.length;
-                if(curDelta < delta){
+                if (curDelta < delta) {
                     found = player;
                     delta = curDelta;
                 }
-                if(curDelta === 0){
+                if (curDelta === 0) {
                     break;
                 }
             }
@@ -491,10 +521,10 @@ class Server {
      * @param name {string}
      * @return {Player}
      */
-    getPlayerExact(name){
+    getPlayerExact(name) {
         name = name.toLowerCase();
 
-        if(this._playerList.has(name)){
+        if (this._playerList.has(name)) {
             return this._playerList.get(name);
         }
 
@@ -505,15 +535,15 @@ class Server {
      * @param partialName {string}
      * @return []{Player}
      */
-    matchPlayer(partialName){
+    matchPlayer(partialName) {
         partialName = partialName.toLowerCase();
         let matchedPlayers = [];
 
-        for(let [username, player] of this._playerList){
-            if(username === partialName){
+        for (let [username, player] of this._playerList) {
+            if (username === partialName) {
                 matchedPlayers = [player];
                 break;
-            }else if(username.indexOf(partialName) === 0){
+            } else if (username.indexOf(partialName) === 0) {
                 matchedPlayers.push(player);
             }
         }
@@ -521,28 +551,47 @@ class Server {
         return matchedPlayers;
     }
 
-    addPlayer(id, player){
+    // TODO: do with functions
+    /** @param player {Player} */
+    sendFullPlayerListData(player) {
+        let pk = new PlayerListPacket();
+        pk.type = PlayerListPacket.TYPE_ADD;
+
+        this._playerList.forEach(player => {
+            pk.entries.push(PlayerListEntry.createAdditionEntry(
+                player._uuid,
+                player.id,
+                player._username,
+                SkinAdapterSingleton.get().toSkinData(player._skin),
+                player._xuid
+            ));
+        });
+
+        player.dataPacket(pk);
+    }
+
+    addPlayer(id, player) {
         CheckTypes([Player, player]);
 
         this._players.addPlayer(id, player);
     }
 
-    addOnlinePlayer(player){
+    addOnlinePlayer(player) {
         CheckTypes([Player, player]);
 
-        this._playerList.addPlayer(player.getLowerCaseName(), player);
+        this._playerList.push(player);
+        // this._playerList.addPlayer(player.getLowerCaseName(), player);
     }
 
-    removeOnlinePlayer(player){
+    removeOnlinePlayer(player) {
         CheckTypes([Player, player]);
-
-        this._playerList.removePlayer(player.getLowerCaseName()); // todo
+        // this._playerList.removePlayer(player.getLowerCaseName()); // todo
     }
 
-    removePlayer(player){
+    removePlayer(player) {
         CheckTypes([Player, player]);
 
-        if(this._players.hasPlayer(player)){
+        if (this._players.hasPlayer(player)) {
             this._players.removePlayer(this._players.getPlayerIdentifier(player));
         }
     }
@@ -550,65 +599,50 @@ class Server {
     /**
      * @return {PlayerList}
      */
-    getPlayerList(){
+    getPlayerList() {
         return this._players;
     }
 
     /**
      * @return {PlayerList}
      */
-    getOnlinePlayerList(){
+    getOnlinePlayerList() {
         return this._playerList;
     }
 
     /**
      * @return {Level|null}
      */
-    getDefaultLevel(){
+    getDefaultLevel() {
         return this._defaultLevel;
     }
 
     /**
      * @return {String}
      */
-    getLevelType(){
+    getLevelType() {
         return this._config.getNested("level.type", "flat");
     }
 
     /**
      * @return {Config}
      */
-    getNameBans(){
+    getNameBans() {
         return this._bannedNames;
     }
 
     /**
      * @return {Config}
      */
-    getIpBans(){
+    getIpBans() {
         return this._bannedIps;
     }
 
-    static getGamemodeName(mode){
-        switch(mode){
-            case Player.SURVIVAL:
-                return "Survival";
-            case Player.CREATIVE:
-                return "Creative";
-            case Player.ADVENTURE:
-                return "Adventure";
-            case Player.SPECTATOR:
-                return "Spectator";
-            default:
-                return "Unknown";
-        }
-    }
-
-    tickProcessor(){
+    tickProcessor() {
         let int = createInterval(() => {
-            if(this.isRunning()){
+            if (this.isRunning()) {
                 this.tick();
-            }else{
+            } else {
                 //this.forceShutdown();
                 int.stop();
             }
@@ -619,22 +653,22 @@ class Server {
     /**
      * @return {GeneratorManager}
      */
-    getGeneratorManager(){
+    getGeneratorManager() {
         return this._generatorManager;
     }
 
-    getRakNetAdapter(){
+    getRakNetAdapter() {
         return this._raknetAdapter;
     }
 
-    tick(){
+    tick() {
         let time = Date.now();
 
         let tickTime = (Date.now() % 1000) / 1000;
 
         ++this._tickCounter;
 
-        if((this._tickCounter % 20) === 0){
+        if ((this._tickCounter % 20) === 0) {
             this.titleTick();
 
             this._currentTPS = 20;
@@ -655,11 +689,11 @@ class Server {
         this._raknetAdapter.tick();
     }
 
-    getTick(){
+    getTick() {
         return this._tickCounter;
     }
 
-    checkTickUpdates(currentTick, tickTime){
+    checkTickUpdates(currentTick, tickTime) {
         this.getOnlinePlayers().forEach(player => {
             if (!player.loggedIn && (tickTime - player.creationTime) >= 10) {
                 player.close("", "Login timeout");
@@ -670,7 +704,7 @@ class Server {
             player.onUpdate(currentTick);
         });
 
-       this._defaultLevel.actuallyDoTick(currentTick);
+        this._defaultLevel.actuallyDoTick(currentTick);
 
 
         //Do level ticks
@@ -690,7 +724,7 @@ class Server {
             }
         });*/
 
-       //refactored here
+        //refactored here
 
         /*this._levels.forEach(k => {
             for(let level of k){
@@ -710,89 +744,94 @@ class Server {
         });*/
     }
 
-    getTicksPerSecond(){
+    getTicksPerSecond() {
         return Math.round_php(this._currentTPS, 2);
     }
 
-    getEventSystem(){
+    getEventSystem() {
         return this._eventSystem;
     }
 
-    getTicksPerSecondAverage(){
+    getTicksPerSecondAverage() {
         return Math.round_php(this._tickAverage.reduce((a, b) => a + b, 0) / this._tickAverage.length, 2);
     }
 
-    getTickUsage(){
+    getTickUsage() {
         return Math.round_php(this._currentUse * 100, 2);
     }
 
-    getTickUsageAverage(){
+    getTickUsageAverage() {
         return Math.round_php((this._useAverage.reduce((a, b) => a + b, 0) / this._useAverage.length) * 100, 2);
     }
 
-    getCurrentTick(){
+    getCurrentTick() {
         return this._currentTPS;
     }
 
-    titleTick(){
-        process.stdout.write("\x1b]0;"+
+    titleTick() {
+        process.stdout.write("\x1b]0;" +
             this.getName() + " " +
             this.getPocketNodeVersion() + " | " +
             "Online " + this.getOnlinePlayerCount() + "/" + this.getMaxPlayers() + " | " +
             "TPS " + this.getTicksPerSecondAverage() + " | " +
             "Load " + this.getTickUsageAverage() + "%"
-        +"\x07");
+            + "\x07");
     }
 
-    batchPackets(players, packets, forceSync = false, immediate = false){
+    batchPackets(players, packets, forceSync = false, immediate = false) {
         let targets = [];
         players.forEach(player => {
-            if(player.isConnected()) targets.push(this._players.getPlayerIdentifier(player));
+            if (player.isConnected()) targets.push(this._players.getPlayerIdentifier(player));
         });
 
-        if(targets.length > 0){
+        if (targets.length > 0) {
             let pk = new BatchPacket();
 
             packets.forEach(packet => pk.addPacket(packet));
 
-            if(!forceSync && !immediate){
+            if (!forceSync && !immediate) {
                 //todo compress batched packets async
-            }else{
+            } else {
                 this.broadcastPackets(pk, targets, immediate);
             }
         }
     }
 
-    broadcastPackets(pk, identifiers, immediate){
-        if(!pk.isEncoded){
+    broadcastPackets(pk, identifiers, immediate) {
+        if (!pk.isEncoded) {
             pk.encode();
         }
 
-        if(immediate){
+        if (immediate) {
             identifiers.forEach(id => {
-                if(this._players.has(id)){
+                if (this._players.has(id)) {
                     this._players.getPlayer(id).directDataPacket(pk);
                 }
             });
-        }else{
+        } else {
             identifiers.forEach(id => {
-                if(this._players.has(id)){
+                if (this._players.has(id)) {
                     this._players.getPlayer(id).dataPacket(pk);
                 }
             });
         }
     }
 
-    onPlayerLogin(player){
+    onPlayerLogin(player) {
         this._loggedInPlayers.addPlayer(player.getLowerCaseName(), player); //todo unique ids
     }
 
-    onPlayerLogout(player){
+    onPlayerLogout(player) {
         this._loggedInPlayers.removePlayer(player.getLowerCaseName()); //todo unique id
     }
 
-    onPlayerCompleteLoginSequence(player){
+    onPlayerCompleteLoginSequence(player) {
 
+    }
+
+    /** @return {Server} */
+    static getInstance() {
+        return Server._instance;
     }
 }
 

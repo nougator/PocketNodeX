@@ -2,18 +2,18 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class NetworkStackLatencyPacket extends DataPacket {
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.NETWORK_STACK_LATENCY_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.timestamp = null;
         this.needResponse = false;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -28,8 +28,9 @@ class NetworkStackLatencyPacket extends DataPacket {
         this.writeBool(this.needResponse);
     }
 
-    handle(session){
+    handle(session) {
         return true;
     }
 }
+
 module.exports = NetworkStackLatencyPacket;

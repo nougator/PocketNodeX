@@ -3,14 +3,17 @@ const Vector3 = require("../../math/Vector3");
 const Entity = require("../../entity/Entity");
 
 const CommandOriginData = require("./protocol/types/CommandOriginData");
-
+const SkinImage = require('./protocol/types/SkinImage');
+const SkinAnimation = require('./protocol/types/SkinAnimation');
+const SkinData = require('./protocol/types/SkinData');
+const EntityLink = require('./protocol/types/EntityLink');
 
 class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") {
 
     /**
      * @return {string}
      */
-    readString(){
+    readString() {
         return this.read(this.readUnsignedVarInt()).toString();
     }
 
@@ -18,9 +21,9 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
      * @param v {string}
      * @return {NetworkBinaryStream}
      */
-    writeString(v){
+    writeString(v) {
         this.writeUnsignedVarInt(Buffer.byteLength(v));
-        if(v.length === 0){
+        if (v.length === 0) {
             return this;
         }
         this.append(Buffer.from(v, "utf8"));
@@ -30,7 +33,7 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
     /**
      * @return {UUID}
      */
-    readUUID(){
+    readUUID() {
         let [p1, p0, p3, p2] = [this.readLInt(), this.readLInt(), this.readLInt(), this.readLInt()];
 
         return new UUID(p0, p1, p2, p3);
@@ -40,7 +43,7 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
      * @param uuid {UUID}
      * @return {NetworkBinaryStream}
      */
-    writeUUID(uuid){
+    writeUUID(uuid) {
         this.writeLInt(uuid.getPart(1))
             .writeLInt(uuid.getPart(0))
             .writeLInt(uuid.getPart(3))
@@ -49,25 +52,25 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         return this;
     }
 
-    readEntityUniqueId(){
+    readEntityUniqueId() {
         return this.readVarLong();
     }
 
-    writeEntityUniqueId(eid){
+    writeEntityUniqueId(eid) {
         this.writeVarLong(eid);
         return this;
     }
 
-    readEntityRuntimeId(){
+    readEntityRuntimeId() {
         return this.readUnsignedVarLong();
     }
 
-    writeEntityRuntimeId(eid){
+    writeEntityRuntimeId(eid) {
         this.writeUnsignedVarLong(eid);
         return this;
     }
 
-    readVector3(){
+    readVector3() {
         return new Vector3(
             this.readRoundedLFloat(4),
             this.readRoundedLFloat(4),
@@ -75,8 +78,8 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         );
     }
 
-    writeVector3(vector){
-        if(vector === null){
+    writeVector3(vector) {
+        if (vector === null) {
             this.writeLFloat(0.0);
             this.writeLFloat(0.0);
             this.writeLFloat(0.0);
@@ -88,10 +91,10 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         return this;
     }
 
-    readEntityMetadata(types = true){
+    readEntityMetadata(types = true) {
         let count = this.readUnsignedVarInt();
         let data = [];
-        for (let i = 0; i < count; ++i){
+        for (let i = 0; i < count; i++) {
             let key = this.readUnsignedVarInt();
             let type = this.readUnsignedVarInt();
             let value = null;
@@ -128,7 +131,7 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
                 default:
                     console.log(`Invalid data type " . ${type}`);
             }
-            if (types){
+            if (types) {
                 data[key] = [type, value];
             } else {
                 data[key] = value;
@@ -181,47 +184,141 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         });
     }
 
-    writeByteRotation(rotation){
-        this.writeByte(Math.floor(rotation / (360/256)));
+    readAttributeList(...attributes) {
+        let list = [];
+        let count = this.readUnsignedVarInt();
+
+        for (let i = 0; i < count; i++) {
+            let min = this.readLFloat();
+            let max = this.readLFloat();
+            let current = this.readLFloat();
+            let normal = this.readLFloat();
+            let name = this.readString();
+        }
+    }
+
+    writeAttributeList(attributes) {
+        this.writeUnsignedVarInt(attributes.length);
+        attributes.forEach(attribute => {
+            this.writeLFloat(attribute.minValue);
+            this.writeLFloat(attribute.maxValue);
+            this.writeLFloat(attribute.currentValue);
+            this.writeLFloat(attribute.defaultValue);
+            this.writeString(attribute.name);
+        });
+            // this.writeLFloat(attribute.getMinValue());
+            // this.writeLFloat(attribute.getMaxValue());
+            // this.writeLFloat(attribute.getValue());
+            // this.writeLFloat(attribute.getDefaultValue());
+            // this.writeString(attribute.getName());
+    }
+
+    /** @return {SkinImage} */
+    readSkinImage() {
+        let width = this.readLInt();
+        let height = this.readLInt();
+        let data = this.readString();
+        return new SkinImage(height, width, data);
+    }
+
+    /** @param image {SkinImage} */
+    writeSkinImage(image) {
+        this.writeLInt(image.getWidth());
+        this.writeLInt(image.getHeight());
+        this.writeString(image.getData());
+    }
+
+    /** @return {SkinData} */
+    readSkin() {
+        let skinId = this.readString();
+        let skinResourcePatch = this.readString();
+        let skinData = this.readSkinImage();
+        let animationCount = this.readLInt();
+        let animations = [], skinImage, animationType, animationFrames;
+        for (let i = 0; i < animationCount; i++) {
+            animations.push(new SkinAnimation(
+                skinImage = this.readSkinImage(),
+                animationType = this.readLInt(),
+                animationFrames = this.readLFloat()
+            ));
+        }
+        let capeData = this.readSkinImage();
+        let geometryData = this.readString();
+        let animationData = this.readString();
+        let premium = this.readBool();
+        let persona = this.readBool();
+        let capeOnClassic = this.readBool();
+        let capeId = this.readString();
+        // let fullSkinId = this.readString();
+
+        return new SkinData(skinId, skinResourcePatch, skinData, animations, capeData, geometryData, animationData, premium, persona, capeOnClassic, capeId);
+    }
+
+    /** @param skin {SkinData} */
+    writeSkin(skin) {
+        this.writeString(skin.getSkinId());
+        this.writeString(skin.getResourcePatch());
+        this.writeSkinImage(skin.getSkinImage());
+        skin.getAnimations().forEach(animation => {
+            this.writeSkinImage(animation.getImage());
+            this.writeLInt(animation.getType());
+            this.writeLFloat(animation.getFrames());
+        });
+        this.writeSkinImage(skin.getCapeImage());
+        this.writeString(skin.getGeometryData());
+        this.writeString(skin.getAnimationData());
+        this.writeBool(skin.isPremium());
+        this.writeBool(skin.isPersona());
+        this.writeBool(skin.isPersonaCapeOnClassic());
+        this.writeString(skin.getCapeId());
+
+        this.writeString(UUID.stringFromRandom());
+    }
+
+    writeByteRotation(rotation) {
+        this.writeByte(Math.floor(rotation / (360 / 256)));
         return this;
     }
 
-    readByteRotation(){
-        return (this.readByte() * (360/256));
+    readByteRotation() {
+        return (this.readByte() * (360 / 256));
     }
 
-    readSlot(){
+    readSlot() {
         //TODO
         let id = this.readVarInt();
-        if(id === 0){
+        if (id === 0) {
             return null; //Change to AIR.
         }
         console.error("readSlot used but not implemented.");
     }
 
-    writeSlot(data){
+    writeSlot(data) {
         console.error("writeSlot used but not implemented.");
         return this;
         //TODO
     }
 
-    readEntityLink(){
-        // let link = new EntityLink();
-        // link.fromEntityUniqueId = this.readEntityUniqueId();
-        // link.toEntityUniqueId = this.readEntityUniqueId();
-        // link.type = this.readByte();
-        // link.immediate = this.readBool();
-        // return link;
+    /** @return {EntityLink} */
+    readEntityLink() {
+        let link = new EntityLink();
+
+        link.fromEntityUniqueId = this.readEntityUniqueId();
+        link.toEntityUniqueId = this.readEntityUniqueId();
+        link.type = this.readByte();
+        link.immediate = this.readBool();
+        return link;
     }
 
-    writeEntityLink(link){
+    /** @param link {EntityLink} */
+    writeEntityLink(link) {
         this.writeEntityUniqueId(link.fromEntityUniqueId);
         this.writeEntityUniqueId(link.toEntityUniqueId);
         this.writeByte(link.type);
         this.writeBool(link.immediate);
     }
 
-    readBlockPosition(){
+    readBlockPosition() {
         return [
             this.readVarInt(),
             this.readUnsignedVarInt(),
@@ -229,14 +326,14 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         ];
     }
 
-    writeBlockPosition(x, y, z){
+    writeBlockPosition(x, y, z) {
         this.writeVarInt(x)
             .writeUnsignedVarInt(y)
             .writeVarInt(z);
         return this;
     }
 
-    readSignedBlockPosition(x, y, z){
+    readSignedBlockPosition(x, y, z) {
         return [
             this.readVarInt(),
             this.readVarInt(),
@@ -244,20 +341,20 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         ]
     }
 
-    writeSignedBlockPosition(x, y, z){
+    writeSignedBlockPosition(x, y, z) {
         this.writeVarInt(x);
         this.writeVarInt(y);
         this.writeVarInt(z);
     }
 
-    readGameRules(){
+    readGameRules() {
         let count = this.readUnsignedVarInt();
         let rules = [];
-        for(let i = 0; i < count; ++i){
+        for (let i = 0; i < count; ++i) {
             let name = this.readString();
             let type = this.readUnsignedVarInt();
             let value = null;
-            switch(type){
+            switch (type) {
                 case 1:
                     value = this.readBool();
                     break;
@@ -275,17 +372,17 @@ class NetworkBinaryStream extends require("../../../binarystream/BinaryStream") 
         return rules;
     }
 
-    writeGameRules(rules){
+    writeGameRules(rules) {
         this.writeUnsignedVarInt(rules.length);
         rules.forEach(rule => {
             this.writeString(rule.getName());
-            if(typeof rule.getValue() === "boolean") {
+            if (typeof rule.getValue() === "boolean") {
                 this.writeByte(1);
                 this.writeBool(rule.getValue());
-            }else if(Number.isInteger(rule.getValue())){
+            } else if (Number.isInteger(rule.getValue())) {
                 this.writeByte(2);
                 this.writeUnsignedVarInt(rule.getValue());
-            }else if(typeof rule.getValue() === "number" && !Number.isInteger(rule.getValue())){
+            } else if (typeof rule.getValue() === "number" && !Number.isInteger(rule.getValue())) {
                 this.writeByte(3);
                 this.writeLFloat(rule.getValue());
             }

@@ -1,7 +1,7 @@
 const ClassHasMethod = require("../utils/methods/ClassHasMethod");
 
 class Plugin {
-    constructor(){
+    constructor() {
         let methods = [
             // Called when the plugin is loaded
             "onLoad",
@@ -57,7 +57,7 @@ class Plugin {
         ];
 
         let missingMethods;
-        if((missingMethods = ClassHasMethod(this.constructor, methods)) !== true){
+        if ((missingMethods = ClassHasMethod(this.constructor, methods)) !== true) {
             throw new Error("Plugin is missing the following method(s): " + missingMethods.join(", "));
         }
     }

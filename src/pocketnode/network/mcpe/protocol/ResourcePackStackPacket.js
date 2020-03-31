@@ -2,27 +2,22 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePackStackPacket extends DataPacket {
-    static getId(){
+    static getId() {
         return ProtocolInfo.RESOURCE_PACK_STACK_PACKET;
     }
 
-    initVars(){
-        this.mustAccept = false;
+    /** @type {boolean} */
+    mustAccept = false;
 
-        this.behaviorPackStack = [];
-        this.resourcePackStack = [];
+    behaviorPackStack = [];
+    resourcePackStack = [];
 
-        this.isExperimental = false;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
-    }
+    /** @type {boolean} */
+    isExperimental = false;
+    /** @type {string} */
+    baseGameVersion = '1.14.0';
 
     _decodePayload() {
-        console.log("ResourcePackStackPacket called!");
-
         this.mustAccept = this.readBool();
         let behaviorPackCount = this.readUnsignedVarInt();
         while (behaviorPackCount-- > 0) {
@@ -39,9 +34,10 @@ class ResourcePackStackPacket extends DataPacket {
         }
 
         this.isExperimental = this.readBool();
+        this.baseGameVersion = this.readString();
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeBool(this.mustAccept);
 
         this.writeUnsignedVarInt(this.behaviorPackStack.length);
@@ -59,6 +55,7 @@ class ResourcePackStackPacket extends DataPacket {
         });
 
         this.writeBool(this.isExperimental);
+        this.writeString(this.baseGameVersion);
     }
 }
 

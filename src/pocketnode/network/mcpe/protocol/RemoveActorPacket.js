@@ -3,18 +3,18 @@ const ProtocolInfo = require("../Info");
 
 class RemoveActorPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.REMOVE_ACTOR_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.entityUniqueId = -1;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -29,4 +29,5 @@ class RemoveActorPacket extends DataPacket {
         return session.handleRemoveActor(this);
     }
 }
+
 module.exports = RemoveActorPacket;

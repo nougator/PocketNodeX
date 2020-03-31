@@ -1,44 +1,88 @@
 const Isset = require("../utils/methods/Isset");
 
-class Attribute{
+class Attribute {
 
-    static get ABSORPTION() {return 0};
-    static get SATURATION() {return 1};
-    static get EXHAUSTION() {return 2};
-    static get KNOCKBACK_RESISTANCE() {return 3};
-    static get HEALTH() {return 4};
-    static get MOVEMENT_SPEED() {return 5};
-    static get FOLLOW_RANGE() {return 6};
-    static get HUNGER() {return 7};
-    static get FOOD() {return 7};
-    static get ATTACK_DAMAGE() {return 8};
-    static get EXPERIENCE_LEVEL() {return 9};
-    static get EXPERIENCE() {return 10};
-    static get UNDERWATER_MOVEMENT() {return 11};
-    static get LUCK() {return 12};
-    static get FALL_DAMAGE() {return 13};
-    static get HORSE_JUMP_STRENGTH() {return 14};
-    static get ZOMBIE_SPAWN_REINFORCEMENTS() {return 15};
+    constructor(id, name, minValue, maxValue, defaultValue, shouldSend = true) {
+        this.initVars();
+        this.id = id;
+        this.name = name;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.defaultValue = defaultValue;
+        this.shouldSend = shouldSend;
 
-    initVars(){
-
-        this.id = -1;
-        this.minValue = -1;
-        this.maxValue = -1;
-        this.defaultValue = -1;
-        this.currentValue = -1;
-        this.name = "";
-        this.shouldSend = false;
-        this.desynchronized = true;
-
-        /**
-         * @type {Map<number, Attribute>}
-         * @protected
-         */
-        this.attributes = new Map();
+        this.currentValue = this.defaultValue;
     }
 
-     static init(){
+    static get ABSORPTION() {
+        return 0
+    };
+
+    static get SATURATION() {
+        return 1
+    };
+
+    static get EXHAUSTION() {
+        return 2
+    };
+
+    static get KNOCKBACK_RESISTANCE() {
+        return 3
+    };
+
+    static get HEALTH() {
+        return 4
+    };
+
+    static get MOVEMENT_SPEED() {
+        return 5
+    };
+
+    static get FOLLOW_RANGE() {
+        return 6
+    };
+
+    static get HUNGER() {
+        return 7
+    };
+
+    static get FOOD() {
+        return 7
+    };
+
+    static get ATTACK_DAMAGE() {
+        return 8
+    };
+
+    static get EXPERIENCE_LEVEL() {
+        return 9
+    };
+
+    static get EXPERIENCE() {
+        return 10
+    };
+
+    static get UNDERWATER_MOVEMENT() {
+        return 11
+    };
+
+    static get LUCK() {
+        return 12
+    };
+
+    static get FALL_DAMAGE() {
+        return 13
+    };
+
+    static get HORSE_JUMP_STRENGTH() {
+        return 14
+    };
+
+    static get ZOMBIE_SPAWN_REINFORCEMENTS() {
+        return 15
+    };
+
+    static init() {
         Attribute.addAttribute(Attribute.ABSORPTION, "minecraft:absorption", 0.00, 340282346638528859811704183484516925440.00, 0.00);
         Attribute.addAttribute(Attribute.SATURATION, "minecraft:player.saturation", 0.00, 20.00, 20.00);
         Attribute.addAttribute(Attribute.EXHAUSTION, "minecraft:player.exhaustion", 0.00, 5.00, 0.0, false);
@@ -57,7 +101,7 @@ class Attribute{
         Attribute.addAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS, "minecraft:zombie.spawn_reinforcements", 0.0, 1.0, 0.0);
     }
 
-    static addAttribute(id, name, minValue, maxValue, defaultValue, currentValue, shouldSend = true){
+    static addAttribute(id, name, minValue, maxValue, defaultValue, currentValue, shouldSend = true) {
         if (minValue > maxValue || defaultValue > maxValue || defaultValue < minValue) {
             console.log(`Invalid ranges: min value: ${minValue}, max value: ${maxValue}, defaultValue: ${defaultValue}`);
         }
@@ -66,13 +110,13 @@ class Attribute{
         return Attribute.attributes.set(id, new Attribute(id, name, minValue, maxValue, defaultValue, currentValue, shouldSend));
     }
 
-    static getAttribute(id){
+    static getAttribute(id) {
         return Isset(Attribute.attributes.get(id) ? Object.assign(Object.create(Object.getPrototypeOf(Attribute.attributes.get(id))), Attribute.attributes.get(id)) : null);
     }
 
-    static getAttributeByName(name){
+    static getAttributeByName(name) {
         Attribute.attributes.forEach(attribute => {
-            if (attribute.getName() === name){
+            if (attribute.getName() === name) {
                 return Object.assign(Object.create(Object.getPrototypeOf(attribute)), attribute);
             }
         });
@@ -80,30 +124,36 @@ class Attribute{
         return null;
     }
 
-    constructor(id, name, minValue, maxValue, defaultValue, shouldSend = true){
-        this.initVars();
-        this.id = id;
-        this.name = name;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.defaultValue = defaultValue;
-        this.shouldSend = shouldSend;
+    initVars() {
 
-        this.currentValue = this.defaultValue;
+        this.id = -1;
+        this.minValue = -1;
+        this.maxValue = -1;
+        this.defaultValue = -1;
+        this.currentValue = -1;
+        this.name = "";
+        this.shouldSend = false;
+        this.desynchronized = true;
+
+        /**
+         * @type {Map<number, Attribute>}
+         * @protected
+         */
+        this.attributes = new Map();
     }
 
-    getMinValue(){
+    getMinValue() {
         return this.minValue;
     }
 
-    setMinValue(minValue){
+    setMinValue(minValue) {
 
         let max;
-        if (minValue > (max = this.getMaxValue())){
+        if (minValue > (max = this.getMaxValue())) {
             console.log(`Minimum ${minValue} is greater than the maximum ${max}`);
         }
 
-        if (this.minValue !== minValue){
+        if (this.minValue !== minValue) {
             this.desynchronized = true;
             this.minValue = minValue;
         }
@@ -111,81 +161,81 @@ class Attribute{
         return this;
     }
 
-    getMaxValue(){
+    getMaxValue() {
         return this.maxValue;
     }
 
-    setMaxValue(maxValue){
+    setMaxValue(maxValue) {
 
         let min;
-        if (maxValue < (min = this.getMinValue())){
+        if (maxValue < (min = this.getMinValue())) {
             console.log(`Maximum ${maxValue} is less than the minimum ${min}`);
         }
 
-        if (this.maxValue !== maxValue){
+        if (this.maxValue !== maxValue) {
             this.desynchronized = true;
             this.maxValue = maxValue;
         }
         return this;
     }
 
-    getDefaultValue(){
+    getDefaultValue() {
         return this.defaultValue;
     }
 
-    setDefaultValue(defaultValue){
+    setDefaultValue(defaultValue) {
 
-        if (defaultValue > (this.getMaxValue() || defaultValue < this.getMinValue())){
+        if (defaultValue > (this.getMaxValue() || defaultValue < this.getMinValue())) {
             console.log(`Default ${defaultValue} is outside the range " . ${this.getMinValue()} . " - " . ${this.getMaxValue()}`);
         }
 
-        if (this.defaultValue !== defaultValue){
+        if (this.defaultValue !== defaultValue) {
             this.desynchronized = true;
             this.defaultValue = defaultValue;
         }
         return this;
     }
 
-    resetToDefault(){
+    resetToDefault() {
         this.setValue(this.getDefaultValue(), true);
     }
 
-    getValue(){
+    getValue() {
         return this.currentValue;
     }
 
-    setValue(value, fit = false, forceSend = false){
+    setValue(value, fit = false, forceSend = false) {
         if (value > this.getMaxValue() || value < this.getMinValue()) {
-            if (!fit){
+            if (!fit) {
                 console.log(`Value ${value} is outside the range " . ${this.getMinValue()} . " - " . ${this.getMaxValue()}`);
             }
 
             value = Math.min(Math.max(value, this.getMinValue(), this.getMaxValue()));
         }
 
-        if (this.currentValue !== value){
+        if (this.currentValue !== value) {
             this.desynchronized = true;
             this.currentValue = value;
-        }else if (forceSend) {
+        } else if (forceSend) {
             this.desynchronized = true;
         }
 
         return this;
     }
 
-    getName(){
+    getName() {
         return this.name;
     }
 
-    getId(){
+    getId() {
         return this.id;
     }
 
-    isSyncable(){
+    isSyncable() {
         return this.shouldSend;
     }
 
-    isDesynchronized(){
+    isDesynchronized() {
         return this.shouldSend && this.desynchronized;
     }
 
@@ -193,4 +243,5 @@ class Attribute{
         this.desynchronized = !synced;
     }
 }
+
 module.exports = Attribute;

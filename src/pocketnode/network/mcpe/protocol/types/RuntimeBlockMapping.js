@@ -2,13 +2,13 @@ const Isset = require("../../../../utils/methods/Isset");
 
 const BinaryStream = require("../../../../../binarystream/BinaryStream");
 
-class RuntimeBlockMapping{
+class RuntimeBlockMapping {
 
-    constructor(){
+    constructor() {
         //NOOP
     }
 
-    static init(){
+    static init() {
         this._legacyToRuntimeMap = [];
         this._runtimeToLegacyMap = [];
 
@@ -22,12 +22,12 @@ class RuntimeBlockMapping{
 
         Object.keys(this._compressedTable.minecraft).forEach(shortStringId => {
             Object.keys(shortStringId).forEach(state => {
-               let name = `minecraft:${shortStringId}`;
-               decompressed.push({
-                   "name": name,
-                   "data":  state,
-                   "legacy_id": legacyIdMap[name]
-               });
+                let name = `minecraft:${shortStringId}`;
+                decompressed.push({
+                    "name": name,
+                    "data": state,
+                    "legacy_id": legacyIdMap[name]
+                });
             });
         });
 
@@ -61,15 +61,15 @@ class RuntimeBlockMapping{
         this._bedrockKnownStates = decompressed;
 
         this._bedrockKnownStates.forEach(obj => {
-           for (let k in obj){
-               if (obj.hasOwnProperty(k)){
-                   if (obj["data"] > 15){
-                       continue;
-                   }
+            for (let k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    if (obj["data"] > 15) {
+                        continue;
+                    }
 
-                   this.registerMapping(k, obj["legacy_id"], obj["data"]);
-               }
-           }
+                    this.registerMapping(k, obj["legacy_id"], obj["data"]);
+                }
+            }
         });
 
         /*this._bedrockKnownStates.forEach(k => {
@@ -85,13 +85,14 @@ class RuntimeBlockMapping{
         });*/
     }
 
-    static getBedrockKnownStates(){
+    static getBedrockKnownStates() {
         return this._bedrockKnownStates;
     }
 
-    static registerMapping(staticRuntimeId, legacyId, legacyMeta){
+    static registerMapping(staticRuntimeId, legacyId, legacyMeta) {
         RuntimeBlockMapping._legacyToRuntimeMap[(legacyId << 4) | legacyMeta] = staticRuntimeId;
         RuntimeBlockMapping._runtimeToLegacyMap[staticRuntimeId] = (legacyId << 4) | legacyMeta;
     }
 }
+
 module.exports = RuntimeBlockMapping;

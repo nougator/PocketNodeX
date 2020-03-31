@@ -11,11 +11,12 @@
 */
 const Event = require("./Event");
 
-class TestEvent extends Event{
+class TestEvent extends Event {
 
-    constructor(){
+    constructor() {
         super();
     }
 
 }
+
 module.exports = TestEvent;

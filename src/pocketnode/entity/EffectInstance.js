@@ -1,17 +1,8 @@
 import INT32_MAX from "../PocketNode";
 
-class EffectInstance{
+class EffectInstance {
 
-    initVars(){
-        this._effectType = null;
-        this._duration = -1;
-        this._amplifier = -1;
-        this._visible = true;
-        this._ambient = false;
-        this._color = null;
-    }
-
-    constructor(effectType, duration = null, amplifier = 0, visible = true, ambient = false, overrideColor = null){
+    constructor(effectType, duration = null, amplifier = 0, visible = true, ambient = false, overrideColor = null) {
         this.initVars();
 
         this._effectType = effectType;
@@ -22,20 +13,29 @@ class EffectInstance{
         this._color = overrideColor; //todo finish here
     }
 
-    getId(){
+    initVars() {
+        this._effectType = null;
+        this._duration = -1;
+        this._amplifier = -1;
+        this._visible = true;
+        this._ambient = false;
+        this._color = null;
+    }
+
+    getId() {
         return this._effectType.getId();
     }
 
-    getType(){
+    getType() {
         return this._effectType;
     }
 
-    getDuration(){
+    getDuration() {
         return this._duration;
     }
 
-    setDuration(duration){
-        if (duration < 0 || duration > INT32_MAX){
+    setDuration(duration) {
+        if (duration < 0 || duration > INT32_MAX) {
             console.log(`Effect duration must be in range 0 - " . ${INT32_MAX} . ", got ${duration}`);
         }
         this._duration = duration;
@@ -43,61 +43,61 @@ class EffectInstance{
         return this;
     }
 
-    decreaseDuration(ticks){
+    decreaseDuration(ticks) {
         this._duration = Math.max(0, this._duration - ticks);
 
         return this;
     }
 
-    hasExpired(){
+    hasExpired() {
         return this._duration <= 0;
     }
 
-    getAmplifier(){
+    getAmplifier() {
         return this._amplifier;
     }
 
-    getEffectLevel(){
+    getEffectLevel() {
         return this._amplifier + 1;
     }
 
-    setAmplifier(amplifier){
+    setAmplifier(amplifier) {
         this._amplifier = amplifier;
 
         return this;
     }
 
-    isVisible() /*: Boolean*/{
+    isVisible() /*: Boolean*/ {
         return this._visible;
     }
 
-    setVisible(visible){
+    setVisible(visible) {
         this._visible = visible;
 
         return this;
     }
 
-    isAmbient(){
+    isAmbient() {
         return this._ambient;
     }
 
-    setAmbient(ambient){
+    setAmbient(ambient) {
         this._ambient = ambient;
 
         return this;
     }
 
-    getColor(){
+    getColor() {
         return this._color;
     }
 
-    setColor(color){
+    setColor(color) {
         this._color = color.clone();
 
         return this;
     }
 
-    resetColor(){
+    resetColor() {
         this._color = this._effectType.getColor();
 
         return this;

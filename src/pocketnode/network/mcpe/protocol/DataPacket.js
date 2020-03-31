@@ -5,75 +5,76 @@ const Attribute = require("../../../entity/Attribute");
 
 class DataPacket extends BinaryStream {
 
-    static getId(){
-        return 0;
-    }
-
-    getId(){
-        return this.constructor.getId();
-    }
-
-    constructor(){
+    constructor() {
         super();
 
         this.isEncoded = false;
     }
 
-    getName(){
+    static getId() {
+        return 0;
+    }
+
+    getId() {
+        return this.constructor.getId();
+    }
+
+    getName() {
         return this.constructor.name;
     }
 
-    canBeBatched(){
+    canBeBatched() {
         return true;
     }
 
-    canBeSentBeforeLogin(){
+    canBeSentBeforeLogin() {
         return false;
     }
 
-    mayHaveUnreadBytes(){
+    mayHaveUnreadBytes() {
         return false;
     }
 
-    clean(){
+    clean() {
         this.isEncoded = false;
         super.reset();
     }
 
-    decode(){
+    decode() {
         this.offset = 0;
         this._decodeHeader();
         this._decodePayload();
     }
 
-    _decodeHeader(){
+    _decodeHeader() {
         let pid = this.readUnsignedVarInt();
-        if (pid !== this.getId()){
+        if (pid !== this.getId()) {
             console.log(`Expected " . ${this.getId()} . " for packet ID, got ${pid}`);
         }
     }
 
-    _decodePayload(){}
+    _decodePayload() {
+    }
 
-    encode(){
+    encode() {
         this.reset();
         this._encodeHeader();
         this._encodePayload();
         this.isEncoded = true;
     }
 
-    _encodeHeader(){
+    _encodeHeader() {
         this.writeUnsignedVarInt(this.getId());
     }
 
-    _encodePayload(){}
+    _encodePayload() {
+    }
 
-    getBuffer(){
+    getBuffer() {
         return this.buffer;
     }
 
-
-    handle(session){
+    handle(session) {
         return false;
     }
 }

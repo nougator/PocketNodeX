@@ -4,12 +4,14 @@ const Logger = require("../logger/Logger");
 
 const PacketPool = require("./mcpe/protocol/PacketPool");
 const BatchPacket = require("./mcpe/protocol/BatchPacket");
+const EncapsulatedPacket = require("../../raknet/protocol/EncapsulatedPacket");
+const PacketReliability = require('../../raknet/protocol/PacketReliability');
 
 const Player = require("../player/Player");
 const PlayerList = require("../player/PlayerList");
 
 class RakNetAdapter {
-    constructor(server){
+    constructor(server) {
         this.server = server;
         this.raknet = new RakNetServer(server.getPort(), new Logger("RakNet").setDebugging(server._debuggingLevel));
         this.raknet.getServerName()
@@ -26,28 +28,45 @@ class RakNetAdapter {
         this.players = new PlayerList();
     }
 
-    setName(name){
+    /** @type {int[]} */
+    _identifiersACK = [];
+
+    setName(name) {
         this.raknet.getServerName().setMotd(name);
     }
 
-    sendPacket(player, packet, needACK, immediate){
-        if(this.players.hasPlayer(player)){
+    putPacket(player, packet, needACK, immediate) {
+        if (this.players.hasPlayer(player)) {
             let identifier = this.players.getPlayerIdentifier(player);
+            if (!packet.isEncoded) {
+                packet.encode();
+            }
 
-            if(packet instanceof BatchPacket){
+            if (packet instanceof BatchPacket) {
+                if (needACK) {
+                    let pk = new EncapsulatedPacket();
+                    pk.identifierACK = this._identifiersACK[identifier]++;
+                    pk.stream.buffer = packet.buffer;
+                    pk.reliability = PacketReliability.RELIABLE_ORDERED;
+                    pk.orderChannel = 0;
+                }
+
                 let session;
-                if((session = this.raknet.getSessionManager().getSessionByIdentifier(identifier))){
+                if ((session = this.raknet.getSessionManager().getSessionByIdentifier(identifier))) {
                     session.queueConnectedPacketFromServer(packet, needACK, immediate);
                 }
                 return null;
-            }else{
+            } else {
                 this.server.batchPackets([player], [packet], true, immediate);
                 //this.logger.debugExtensive("Sending "+packet.getName()+":", packet.buffer);
+                return null;
             }
         }
+
+        return null;
     }
 
-    tick(){
+    tick() {
         this.raknet.getSessionManager().readOutgoingMessages().forEach(message => this._handleIncomingMessage(message.purpose, message.data));
 
         this.raknet.getSessionManager().getSessions().forEach(session => {
@@ -62,29 +81,29 @@ class RakNetAdapter {
         });
     }
 
-    close(player, reason = "unknown reason"){
-        if(this.players.hasPlayer(player._ip + ":" + player._port)){
+    close(player, reason = "unknown reason") {
+        if (this.players.hasPlayer(player._ip + ":" + player._port)) {
             this.raknet.getSessionManager().removeSession(this.raknet.getSessionManager().getSession(player._ip, player._port), reason);
             this.players.removePlayer(player._ip + ":" + player._port);
         }
     }
 
-    shutdown(){
+    shutdown() {
         this.raknet.shutdown();
     }
 
-    _handleIncomingMessage(purpose, data){
+    _handleIncomingMessage(purpose, data) {
         let player;
-        switch(purpose){
+        switch (purpose) {
             case "openSession":
                 //TODO: call PlayerCreationEvent
-                player = new Player(this.server, data.clientId, data.ip, data.port);
+                player = new Player(this, this.server, data.clientId, data.ip, data.port);
                 this.players.addPlayer(data.identifier, player);
                 this.server.getPlayerList().addPlayer(data.identifier, player);
                 break;
 
             case "closeSession":
-                if(this.players.has(data.identifier)){
+                if (this.players.has(data.identifier)) {
                     player = this.players.get(data.identifier);
                     this.players.removePlayer(player);
                     player.close(player.getLeaveMessage(), data.reason);

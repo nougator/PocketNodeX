@@ -4,12 +4,12 @@
  * @param cb {Function} run this in async
  * @return {Promise<*>}
  */
-function Async(cb){
+function Async(cb) {
     return new Promise((resolve, reject) => {
         setImmediate(() => {
             try {
                 resolve(cb());
-            } catch(e) {
+            } catch (e) {
                 reject(e);
             }
         });

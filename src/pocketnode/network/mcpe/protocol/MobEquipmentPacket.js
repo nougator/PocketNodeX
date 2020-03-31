@@ -3,11 +3,16 @@ const ProtocolInfo = require("../Info");
 
 class MobEquipmentPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.MOB_EQUIPMENT_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.entityRuntimeId = -1;
         this.item = null;
         this.inventorySlot = -1;
@@ -15,13 +20,8 @@ class MobEquipmentPacket extends DataPacket {
         this.windowId = 0;
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
     _decodePayload() {
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         this.item = this.readSlot();
         this.inventorySlot = this.readByte();
         this.hotbarSlot = this.readByte();
@@ -41,4 +41,5 @@ class MobEquipmentPacket extends DataPacket {
     }
 
 }
+
 module.exports = MobEquipmentPacket;

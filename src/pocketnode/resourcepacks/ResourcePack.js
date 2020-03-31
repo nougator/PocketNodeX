@@ -1,7 +1,7 @@
 const ClassHasMethod = pocketnode("utils/methods/ClassHasMethod");
 
 class ResourcePack {
-    constructor(){
+    constructor() {
         let methods = [
             "getPackName",
             "getPackId",
@@ -12,7 +12,7 @@ class ResourcePack {
         ];
 
         let missingMethods;
-        if((missingMethods = ClassHasMethod(this.constructor, methods)) !== true){
+        if ((missingMethods = ClassHasMethod(this.constructor, methods)) !== true) {
             throw new Error(this.constructor.name + " is missing the following method(s): " + missingMethods.join(", "));
         }
     }

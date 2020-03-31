@@ -9,7 +9,7 @@ const Config = require("./utils/Config");
 const INT32_MIN = -0x80000000;
 const INT32_MAX = 0x7fffffff;
 
-function PocketNode(paths){
+function PocketNode(paths) {
     this.START_TIME = Date.now();
     this.NAME = "PocketNodeX";
     this.CODENAME = "[ALPHA]";
@@ -23,9 +23,9 @@ function PocketNode(paths){
         plugins: Path.normalize(__dirname + "/../../plugins/")
     };
 
-    for (let i in paths){
+    for (let i in paths) {
         if (paths.hasOwnProperty(i)) {
-            if (typeof path[i] !== "undefined"){
+            if (typeof path[i] !== "undefined") {
                 path[i] = paths[i];
             }
         }
@@ -38,8 +38,9 @@ function PocketNode(paths){
     logger.info(this.localizationManager.getPhrase("loading"));
 
     let server = new Server(this, this.localizationManager, logger, path);
+    Server._instance = server;
 
-    if(TRAVIS_BUILD === true){
+    if (TRAVIS_BUILD === true) {
         server.shutdown();
     }
 

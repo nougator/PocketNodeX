@@ -16,13 +16,13 @@ class Location extends Position {
     /**
      * Represents a Position with added Yaw and Pitch references
      * @constructor
-	 * @param {Number}   x
-	 * @param {Number}   y
-	 * @param {Number}   z
-	 * @param {Number}   yaw
-	 * @param {Number}   pitch
-	 * @param {Level}    level
-	 */
+     * @param {Number}   x
+     * @param {Number}   y
+     * @param {Number}   z
+     * @param {Number}   yaw
+     * @param {Number}   pitch
+     * @param {Level}    level
+     */
 
     /**
      * @param x     {Number}
@@ -32,11 +32,11 @@ class Location extends Position {
      * @param pitch {Number}
      * @param level {Level}
      */
-	constructor(x = 0, y = 0, z = 0, yaw = 0.0, pitch = 0.0, level = null){
+    constructor(x = 0, y = 0, z = 0, yaw = 0.0, pitch = 0.0, level = null) {
         super(x, y, z, level);
-		this._yaw = yaw;
-		this._pitch = pitch;
-	}
+        this._yaw = yaw;
+        this._pitch = pitch;
+    }
 
     /**
      * @param pos   {Vector3}
@@ -46,33 +46,33 @@ class Location extends Position {
      *
      * @return {Location}
      */
-    static fromObject(pos, level = null, yaw = 0.0, pitch = 0.0){
+    static fromObject(pos, level = null, yaw = 0.0, pitch = 0.0) {
         return new Location(pos.x, pos.y, pos.z, yaw, pitch, (level === null ? (pos instanceof Position ? pos.level : null) : level));
     }
 
     /**
-    * Return a Location instance
-    *
-    * @return {Location}
-    */
-    asLocation(){
+     * Return a Location instance
+     *
+     * @return {Location}
+     */
+    asLocation() {
         return new Location(this.x, this.y, this.z, this._yaw, this._pitch, this.level);
     }
 
-    getYaw(){
+    getYaw() {
         return this._yaw;
     }
 
-    getPitch(){
+    getPitch() {
         return this._pitch;
     }
 
-    toString(){
+    toString() {
         return "Location (level=" + (this.isValid() ? this.getLevel().getName() : "null") + ", x=" + this.x + ", y=" + this.y + ", z=" + this.z + ", yaw=" + this._yaw + ", pitch=" + this._pitch + ")";
     }
-    
-    equals(v){
-        if(v instanceof Location){
+
+    equals(v) {
+        if (v instanceof Location) {
             return super.equals(v) && v.yaw === this._yaw && v.pitch === this._pitch;
         }
         return super.equals(v);

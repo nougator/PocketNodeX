@@ -3,7 +3,7 @@
  * @param v {*}
  * @return {boolean}
  */
-function Isset(v){
+function Isset(v) {
     return typeof v !== "undefined";
 }
 

@@ -1,13 +1,30 @@
 const SlotChangeAction = require("../../../../inventory/transaction/action/SlotChangeAction");
 
-class NetworkInventoryAction{
+class NetworkInventoryAction {
 
-    static get SOURCE_CONTAINER() {return 0};
+    constructor() {
+        this.initVars();
+    }
 
-    static get SOURCE_WORLD() {return 2}; //drop/pickup item entity
-    static get SOURCE_CREATIVE() {return 3};
-    static get SOURCE_CRAFTING_GRID() {return 100};
-    static get SOURCE_TODO() {return 99999};
+    static get SOURCE_CONTAINER() {
+        return 0
+    };
+
+    static get SOURCE_WORLD() {
+        return 2
+    }; //drop/pickup item entity
+
+    static get SOURCE_CREATIVE() {
+        return 3
+    };
+
+    static get SOURCE_CRAFTING_GRID() {
+        return 100
+    };
+
+    static get SOURCE_TODO() {
+        return 99999
+    };
 
     /**
      * Fake window IDs for the SOURCE_TODO type (99999)
@@ -18,47 +35,98 @@ class NetworkInventoryAction{
      *
      * Expect these to change in the future.
      */
-    static get SOURCE_TYPE_CRAFTING_ADD_INGREDIENT() {return  -2}; 
-    static get SOURCE_TYPE_CRAFTING_REMOVE_INGREDIENT() {return  -3}; 
-    static get SOURCE_TYPE_CRAFTING_RESULT() {return  -4}; 
-    static get SOURCE_TYPE_CRAFTING_USE_INGREDIENT() {return  -5}; 
+    static get SOURCE_TYPE_CRAFTING_ADD_INGREDIENT() {
+        return -2
+    };
 
-    static get SOURCE_TYPE_ANVIL_INPUT() {return  -10}; 
-    static get SOURCE_TYPE_ANVIL_MATERIAL() {return  -11}; 
-    static get SOURCE_TYPE_ANVIL_RESULT() {return  -12}; 
-    static get SOURCE_TYPE_ANVIL_OUTPUT() {return  -13}; 
+    static get SOURCE_TYPE_CRAFTING_REMOVE_INGREDIENT() {
+        return -3
+    };
 
-    static get SOURCE_TYPE_ENCHANT_INPUT() {return  -15}; 
-    static get SOURCE_TYPE_ENCHANT_MATERIAL() {return  -16}; 
-    static get SOURCE_TYPE_ENCHANT_OUTPUT() {return  -17}; 
+    static get SOURCE_TYPE_CRAFTING_RESULT() {
+        return -4
+    };
 
-    static get SOURCE_TYPE_TRADING_INPUT_1() {return  -20}; 
-    static get SOURCE_TYPE_TRADING_INPUT_2() {return  -21}; 
-    static get SOURCE_TYPE_TRADING_USE_INPUTS() {return  -22}; 
-    static get SOURCE_TYPE_TRADING_OUTPUT() {return  -23}; 
+    static get SOURCE_TYPE_CRAFTING_USE_INGREDIENT() {
+        return -5
+    };
 
-    static get SOURCE_TYPE_BEACON() {return  -24}; 
+    static get SOURCE_TYPE_ANVIL_INPUT() {
+        return -10
+    };
+
+    static get SOURCE_TYPE_ANVIL_MATERIAL() {
+        return -11
+    };
+
+    static get SOURCE_TYPE_ANVIL_RESULT() {
+        return -12
+    };
+
+    static get SOURCE_TYPE_ANVIL_OUTPUT() {
+        return -13
+    };
+
+    static get SOURCE_TYPE_ENCHANT_INPUT() {
+        return -15
+    };
+
+    static get SOURCE_TYPE_ENCHANT_MATERIAL() {
+        return -16
+    };
+
+    static get SOURCE_TYPE_ENCHANT_OUTPUT() {
+        return -17
+    };
+
+    static get SOURCE_TYPE_TRADING_INPUT_1() {
+        return -20
+    };
+
+    static get SOURCE_TYPE_TRADING_INPUT_2() {
+        return -21
+    };
+
+    static get SOURCE_TYPE_TRADING_USE_INPUTS() {
+        return -22
+    };
+
+    static get SOURCE_TYPE_TRADING_OUTPUT() {
+        return -23
+    };
+
+    static get SOURCE_TYPE_BEACON() {
+        return -24
+    };
 
     /** Any client-side window dropping its contents when the player closes it */
-    static get SOURCE_TYPE_CONTAINER_DROP_CONTENTS() {return  -100}; 
+    static get SOURCE_TYPE_CONTAINER_DROP_CONTENTS() {
+        return -100
+    };
 
-    static get ACTION_MAGIC_SLOT_CREATIVE_DELETE_ITEM() {return  0}; 
-    static get ACTION_MAGIC_SLOT_CREATIVE_CREATE_ITEM() {return  1}; 
+    static get ACTION_MAGIC_SLOT_CREATIVE_DELETE_ITEM() {
+        return 0
+    };
 
-    static get ACTION_MAGIC_SLOT_DROP_ITEM() {return  0}; 
-    static get ACTION_MAGIC_SLOT_PICKUP_ITEM() {return  1}; 
+    static get ACTION_MAGIC_SLOT_CREATIVE_CREATE_ITEM() {
+        return 1
+    };
 
-    initVars(){
+    static get ACTION_MAGIC_SLOT_DROP_ITEM() {
+        return 0
+    };
+
+    static get ACTION_MAGIC_SLOT_PICKUP_ITEM() {
+        return 1
+    };
+
+    initVars() {
         this.sourceType = -1;
         this.windowId = -1;
         this.sourceFlags = 0;
         this.inventorySlot = -1;
         this.oldItem = null;
         this.newItem = null;
-    }
-
-    constructor(){
-        this.initVars();
     }
 
     read(packet) {
@@ -95,7 +163,7 @@ class NetworkInventoryAction{
         return this;
     }
 
-    write(packet){
+    write(packet) {
         packet.writeUnsignedVarInt(this.sourceType);
 
         switch (this.sourceType) {
@@ -120,22 +188,23 @@ class NetworkInventoryAction{
         packet.writeSlot(this.newItem);
     }
 
-    createInventoryAction(player){
+    createInventoryAction(player) {
         switch (this.sourceType) {
             case NetworkInventoryAction.SOURCE_CONTAINER:
                 let window = player.getWindow(this.windowId);
-                if (window !== null){
+                if (window !== null) {
                     return new SlotChangeAction(window, this.inventorySlot, this.oldItem, this.newItem);
                 }
 
                 console.log(`Player " . ${player.getName()} . " has no open container with window ID ${this.windowId}`);
             case NetworkInventoryAction.SOURCE_WORLD:
-                if (this.inventorySlot !== NetworkInventoryAction.ACTION_MAGIC_SLOT_DROP_ITEM){
+                if (this.inventorySlot !== NetworkInventoryAction.ACTION_MAGIC_SLOT_DROP_ITEM) {
                     console.log(`Only expecting drop-item world actions from the client!`);
                 }
 
-                //TODO
+            //TODO
         }
     }
 }
+
 module.exports = NetworkInventoryAction;

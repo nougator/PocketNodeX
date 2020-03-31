@@ -3,26 +3,34 @@ const ProtocolInfo = require("../Info");
 
 class MobEffectPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static get EVENT_ADD() {
+        return 1
+    };
+
+    static get EVENT_MODIFY() {
+        return 2
+    };
+
+    static get EVENT_REMOVE() {
+        return 3
+    };
+
     static getId() {
         return ProtocolInfo.MOB_EFFECT_PACKET;
     }
 
-    static get EVENT_ADD() {return 1};
-    static get EVENT_MODIFY() {return 2};
-    static get EVENT_REMOVE() {return 3};
-
-    initVars(){
+    initVars() {
         this.entityRuntimeId = -1;
         this.eventId = -1;
         this.effectId = -1;
         this.amplifier = 0;
         this.particles = true;
         this.duration = 0;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -47,4 +55,5 @@ class MobEffectPacket extends DataPacket {
         return session.handleMobEffect(this);
     }
 }
+
 module.exports = MobEffectPacket;

@@ -3,23 +3,52 @@ const ProtocolInfo = require("../Info");
 
 class UpdateBlockPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static get FLAG_NONE() {
+        return 0b0000
+    };
+
+    static get FLAG_NEIGHBORS() {
+        return 0b0001
+    };
+
+    static get FLAG_NETWORK() {
+        return 0b0010
+    };
+
+    static get FLAG_NOGRAPHIC() {
+        return 0b0100
+    };
+
+    static get FLAG_PRIORITY() {
+        return 0b1000
+    };
+
+    static get FLAG_ALL() {
+        return UpdateBlockPacket.FLAG_NEIGHBORS | UpdateBlockPacket.FLAG_NETWORK
+    };
+
+    static get FLAG_ALL_PRIORITY() {
+        return UpdateBlockPacket.FLAG_ALL | UpdateBlockPacket.FLAG_PRIORITY
+    };
+
+    static get DATA_LAYER_NORMAL() {
+        return 0
+    };
+
+    static get DATA_LAYER_LIQUID() {
+        return 1
+    };
+
     static getId() {
         return ProtocolInfo.UPDATE_BLOCK_PACKET;
     }
 
-    static get FLAG_NONE() {return 0b0000};
-    static get FLAG_NEIGHBORS() {return 0b0001};
-    static get FLAG_NETWORK() {return 0b0010};
-    static get FLAG_NOGRAPHIC() {return 0b0100};
-    static get FLAG_PRIORITY() {return 0b1000};
-
-    static get FLAG_ALL() {return UpdateBlockPacket.FLAG_NEIGHBORS | UpdateBlockPacket.FLAG_NETWORK};
-    static get FLAG_ALL_PRIORITY() {return UpdateBlockPacket.FLAG_ALL | UpdateBlockPacket.FLAG_PRIORITY};
-
-    static get DATA_LAYER_NORMAL() {return 0};
-    static get DATA_LAYER_LIQUID() {return 1};
-
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.x = -1;
         /** @type {number} */
@@ -32,11 +61,6 @@ class UpdateBlockPacket extends DataPacket {
         this.flags = -1;
         /** @type {number} */
         this.dataLayerId = UpdateBlockPacket.DATA_LAYER_NORMAL;
-    }
-
-    constructor() {
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -58,4 +82,5 @@ class UpdateBlockPacket extends DataPacket {
     }
 
 }
+
 module.exports = UpdateBlockPacket;

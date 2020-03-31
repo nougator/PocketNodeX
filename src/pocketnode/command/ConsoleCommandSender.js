@@ -1,19 +1,19 @@
 const CommandSender = require("./CommandSender");
 
 class ConsoleCommandSender extends CommandSender {
-    constructor(server){
+    constructor(server) {
         super(server);
     }
 
-    sendMessage(message){
+    sendMessage(message) {
         this.server.getLogger().info(message);
     }
 
-    getName(){
+    getName() {
         return "CONSOLE";
     }
 
-    isOp(){
+    isOp() {
         return true;
     }
 }

@@ -13,63 +13,63 @@
 const SubChunkInterface = require("./SubChunkInterface");
 
 class EmptySubChunk extends SubChunkInterface {
-    constructor(){
+    constructor() {
         super();
     }
 
-    isEmpty(){
+    isEmpty() {
         return true;
     }
 
-    getBlockId(){
+    getBlockId() {
         return 0;
     }
 
-    setBlock(){
+    setBlock() {
         return false;
     }
 
-    setBlockId(){
+    setBlockId() {
         return false;
     }
 
-    getBlockData(){
+    getBlockData() {
         return 0;
     }
 
-    setBlockData(){
+    setBlockData() {
         return false;
     }
 
-    getBlockLight(){
+    getBlockLight() {
         return 0;
     }
 
-    setBlockLight(){
+    setBlockLight() {
         return false;
     }
 
-    getBlockSkyLight(){
+    getBlockSkyLight() {
         return 0;
     }
 
-    setBlockSkyLight(){
+    setBlockSkyLight() {
         return false;
     }
 
-    getHighestBlockId(){
+    getHighestBlockId() {
         return 0;
     }
 
-    getHighestBlockData(){
+    getHighestBlockData() {
         return 0;
     }
 
-    getHighestBlock(){
+    getHighestBlock() {
         return 0;
     }
 
-    toBinary(){
+    toBinary() {
         return Buffer.alloc(6145).fill(0x00);
     }
 }

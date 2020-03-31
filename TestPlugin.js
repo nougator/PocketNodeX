@@ -11,7 +11,7 @@ let manifest = new PluginManifest({
 });
 
 class MyPlugin extends PluginBase {
-    onEnable(){
+    onEnable() {
         this.getLogger().info("enabled!");
     }
 }

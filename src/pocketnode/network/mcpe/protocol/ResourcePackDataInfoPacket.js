@@ -3,11 +3,11 @@ const ProtocolInfo = require("../Info");
 const ResourcePackType = require("./types/ResourcePackType");
 
 class ResourcePackDataInfoPacket extends DataPacket {
-    static getId(){
+    static getId() {
         return ProtocolInfo.RESOURCE_PACK_DATA_INFO_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.packId = "";
         this.maxChunkSize = 0;
         this.chunkCount = 0;
@@ -17,7 +17,7 @@ class ResourcePackDataInfoPacket extends DataPacket {
         this.packType = ResourcePackType.RESOURCES; //TODO: check the values for this
     }
 
-    _decodePayload(){
+    _decodePayload() {
         this.packId = this.readString();
         this.maxChunkSize = this.readLInt();
         this.chunkCount = this.readLInt();
@@ -27,7 +27,7 @@ class ResourcePackDataInfoPacket extends DataPacket {
         this.packType = this.readByte();
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeString(this.packId);
         this.writeLInt(this.maxChunkSize);
         this.writeLInt(this.chunkCount);

@@ -5,7 +5,21 @@ const InvalidParameterError = require("../error/InvalidParameterError");
 
 
 class Command {
-    initVars(){
+    /**
+     * @param name        {string}
+     * @param description {string}
+     * @param permission  {string}
+     * @param aliases     {array}
+     */
+    constructor(name, description, permission, aliases = []) {
+        this.initVars();
+        this.name = name;
+        this.description = description;
+        this.permission = permission;
+        this.aliases = aliases;
+    }
+
+    initVars() {
         this.name = "";
         this.description = "";
         this.permission = "";
@@ -14,43 +28,29 @@ class Command {
         this.arguments = [];
     }
 
-    /**
-     * @param name        {string}
-     * @param description {string}
-     * @param permission  {string}
-     * @param aliases     {array}
-     */
-    constructor(name, description, permission, aliases = []){
-        this.initVars();
-        this.name = name;
-        this.description = description;
-        this.permission = permission;
-        this.aliases = aliases;
-    }
-
-    getName(){
+    getName() {
         return this.name;
     }
 
-    getDescription(){
+    getDescription() {
         return this.description;
     }
 
-    getUsage(){
+    getUsage() {
         let usage = TextFormat.RED + "Usage: /" + this.getName() + " ";
 
         this.getArguments().forEach(argument => {
-            if(argument.isRequired()){
+            if (argument.isRequired()) {
                 usage += "<";
-            }else{
+            } else {
                 usage += "[";
             }
 
             usage += argument.getName() + ": " + argument.getType();
 
-            if(argument.isRequired()){
+            if (argument.isRequired()) {
                 usage += ">";
-            }else{
+            } else {
                 usage += "]";
             }
 
@@ -61,39 +61,39 @@ class Command {
         return usage;
     }
 
-    getPermission(){
+    getPermission() {
         return this.permission;
     }
 
-    getAliases(){
+    getAliases() {
         return this.aliases;
     }
 
     // testPermission
 
-    addArgument(name, type, isRequired){
+    addArgument(name, type, isRequired) {
         this.arguments.push({
             name: name,
             type: type,
             required: isRequired,
-            getName: function(){
+            getName: function () {
                 return this.name;
             },
-            getType: function(){
+            getType: function () {
                 return this.type;
             },
-            isRequired: function(){
+            isRequired: function () {
                 return this.required;
             }
         });
     }
 
-    getArguments(){
+    getArguments() {
         return this.arguments;
     }
 
-    execute(sender, args){
-        if(!sender instanceof CommandSender && !sender instanceof ConsoleCommandSender){
+    execute(sender, args) {
+        if (!sender instanceof CommandSender && !sender instanceof ConsoleCommandSender) {
             throw new InvalidParameterError("Command sender not of type CommandSender.");
         }
     }

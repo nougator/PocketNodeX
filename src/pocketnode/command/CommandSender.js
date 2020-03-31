@@ -1,13 +1,13 @@
 class CommandSender {
-    constructor(server){
+    constructor(server) {
         this.server = server;
     }
 
-    hasPermission(){
+    hasPermission() {
         return false;
     }
 
-    getServer(){
+    getServer() {
         return this.server;
     }
 }

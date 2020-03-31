@@ -9,7 +9,7 @@ class AddPaintingPacket extends DataPacket {
         return ProtocolInfo.ADD_PAINTING_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number|null} */
         this.entityUniqueId = null;
         /** @type {number} */
@@ -42,4 +42,5 @@ class AddPaintingPacket extends DataPacket {
         return session.handleAddPainting(this);
     }
 }
+
 module.exports = AddPaintingPacket;

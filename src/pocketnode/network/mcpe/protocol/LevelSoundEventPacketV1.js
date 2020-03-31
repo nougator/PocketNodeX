@@ -5,11 +5,16 @@ const Vector3 = require("../../../math/Vector3");
 
 class LevelSoundEventPacketV1 extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V1;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.sound = -1;
         /** @type {Vector3} */
@@ -22,11 +27,6 @@ class LevelSoundEventPacketV1 extends DataPacket {
         this.isBabyMob = false; //...
         /** @type {boolean} */
         this.disableRelativeVolume = false;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -51,4 +51,5 @@ class LevelSoundEventPacketV1 extends DataPacket {
         return session.handleLevelSoundEventPacketV1(this);
     }
 }
+
 module.exports = LevelSoundEventPacketV1;

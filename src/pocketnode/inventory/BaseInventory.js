@@ -16,16 +16,7 @@ const Isset = require("../utils/methods/Isset");
 const Item = require("../item/Item");
 
 
-class BaseInventory extends Inventory{
-
-    initVars(){
-        this._maxStackSize = Inventory.MAX_STACK;
-        this._name = "";
-        this._title = "";
-        this._slots = [];
-        this._viewers = [];
-        this._eventProcessor = new InventoryEventProcessor();
-    }
+class BaseInventory extends Inventory {
 
     constructor(items = [], size = null, title = null) {
         super();
@@ -36,12 +27,22 @@ class BaseInventory extends Inventory{
         this.setContents(items, false);
     }
 
+    initVars() {
+        this._maxStackSize = Inventory.MAX_STACK;
+        this._name = "";
+        this._title = "";
+        this._slots = [];
+        this._viewers = [];
+        this._eventProcessor = new InventoryEventProcessor();
+    }
+
     /**
      * @return {string}
      */
-    getName(){};
+    getName() {
+    };
 
-    getTitle(){
+    getTitle() {
         return this._title;
     }
 
@@ -49,7 +50,7 @@ class BaseInventory extends Inventory{
      * Returns the size of the inventory.
      * @return {number}
      */
-    getSize(){
+    getSize() {
         return this._slots.length;
     }
 
@@ -59,45 +60,46 @@ class BaseInventory extends Inventory{
      *
      * @param size {number}
      */
-    setSize(size){
+    setSize(size) {
         this._slots.length = size;
     }
 
-    getDefaultSize(){};
+    getDefaultSize() {
+    };
 
     getMaxStackSize() {
         return this._maxStackSize;
     }
 
-    setContents(items, send = true){
-        if (items.length > this.getSize()){
+    setContents(items, send = true) {
+        if (items.length > this.getSize()) {
             let items = items.slice(0, this.getSize());
         }
-        
-        for (let i = 0, size = this.getSize(); i < size; ++i){
-            if (!Isset(items[i])){
+
+        for (let i = 0, size = this.getSize(); i < size; ++i) {
+            if (!Isset(items[i])) {
                 if (this._slots[i] !== null) {
                     this.clear(i, false);
                 }
             } else {
-                if (!this.setItem(i, items[i], false)){
+                if (!this.setItem(i, items[i], false)) {
                     this.clear(i, false);
                 }
             }
         }
 
-        if (send){
+        if (send) {
             this.setContents(this.getViewers());
         }
     }
 
-    getViewers() /*: Player[] mhh.. this might crash server xD*/{
+    getViewers() /*: Player[] mhh.. this might crash server xD*/ {
         return this._viewers;
     }
 
-    setItem(index, item, send = true){
+    setItem(index, item, send = true) {
         CheckTypes([Item, item]);
-        if (item.isNull()){
+        if (item.isNull()) {
 
         }
     }

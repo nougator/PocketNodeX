@@ -6,12 +6,40 @@ const InventoryHolder = require("../inventory/InventoryHolder");
 const Skin = require("./Skin");
 const Player = require("../player/Player");
 const PlayerSkinPacket = require("../network/mcpe/protocol/PlayerSkinPacket");
-const CompoundTag = require("../nbt/tag/CompoundTag");
 const UUID = require("../utils/UUID");
 const Level = require("../level/Level");
-const StringTag = require("../nbt/tag/StringTag");
+const Entity = require('../entity/Entity');
 
-class Human extends multiple(Creature, ProjectileSource, InventoryHolder)  /*implements ProjectileSource, InventoryHolder*/{
+class Human extends Entity {
+
+    //TODO: replace Server with level
+    /**
+     * @param server
+     */
+    constructor(server) {
+        super(server);
+
+        // if (this._skin === null) {
+        //     let skinTag = nbt.getCompoundTag("Skin");
+        //     if (skinTag === null) {
+        //         console.log("Human must have a valid skin set");
+        //     }
+        //     this._skin = self.deserializeSkinNBT(skinTag);
+        // }
+
+    }
+
+    // static deserializeSkinNBT(skinTag) {
+    //     let skin = new Skin(
+    //         skinTag.getString("Name"),
+    //         skinTag.hasTag("Data", StringTag) ? skinTag.getString("Data") : skinTag.getByteArray("Data"),
+    //         skinTag.getByteArray("CapeData", ""),
+    //         skinTag.getString("GeometryName", ""),
+    //         skinTag.getByteArray("GeometryData", "")
+    //     );
+    //     skin.validate();
+    //     return skin;
+    // }
 
     initVars() {
 
@@ -40,61 +68,17 @@ class Human extends multiple(Creature, ProjectileSource, InventoryHolder)  /*imp
         //console.log(`'${method}()' is missing!`);
     }
 
-
-    //TODO: replace Server with level
-    /**
-     * @param server
-     * @param nbt {CompoundTag}
-     */
-    constructor(server, nbt){
-        super(server, nbt);
-
-        if (this._skin === null){
-            let skinTag = nbt.getCompoundTag("Skin");
-            if (skinTag === null){
-                console.log("Human must have a valid skin set");
-            }
-            this._skin = self.deserializeSkinNBT(skinTag);
-        }
-
-    }
-
-    /**
-     * @return {Skin}
-     * @param skinTag {CompoundTag}
-     */
-    static deserializeSkinNBT(skinTag){
-        let skin = new Skin(
-            skinTag.getString("Name"),
-            skinTag.hasTag("Data", StringTag) ? skinTag.getString("Data") : skinTag.getByteArray("Data"),
-            skinTag.getByteArray("CapeData", ""),
-            skinTag.getString("GeometryName", ""),
-            skinTag.getByteArray("GeometryData", "")
-        );
-        skin.validate();
-        return skin;
-    }
-
-    /**
-     * @deprecated
-     * @param skin {string}
-     * @returns {boolean}
-     */
-    static isValidSkin(skin){
-        return Skin.getAcceptedSkinSizes().includes(skin.length);
-    }
-
     /**
      * @return {UUID|null}
      */
-    getUniqueId(){
+    getUniqueId() {
         return this._uuid;
     }
 
     /**
      * @returns {string}
      */
-    getRawUniqueId(){
+    getRawUniqueId() {
         return this._rawUUID;
     }
 
@@ -102,7 +86,7 @@ class Human extends multiple(Creature, ProjectileSource, InventoryHolder)  /*imp
      * Returns a Skin object containing information about this human's skin.
      * @returns {Skin}
      */
-    getSkin(){
+    getSkin() {
         return this._skin;
     }
 
@@ -111,7 +95,7 @@ class Human extends multiple(Creature, ProjectileSource, InventoryHolder)  /*imp
      *
      * @param skin {Skin}
      */
-    setSkin(skin){
+    setSkin(skin) {
         skin.validate();
         this._skin = skin;
         this._skin.debloatGeometryData();
@@ -131,14 +115,14 @@ class Human extends multiple(Creature, ProjectileSource, InventoryHolder)  /*imp
         // this.server.broadcastPackets(pk, targets || this.hasSpawned)
     }
 
-    jump(){
+    jump() {
         super.jump();
         if (this.isSprinting()) {
             //TODO
         }
     }
 
-    getFood(){
+    getFood() {
         //TODO: attribute map
     }
 

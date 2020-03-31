@@ -3,18 +3,18 @@ const ProtocolInfo = require("../Info");
 
 class RiderJumpPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.RIDER_JUMP_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.jumpStrenght = -1; //percentage
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -30,4 +30,5 @@ class RiderJumpPacket extends DataPacket {
     }
 
 }
+
 module.exports = RiderJumpPacket;

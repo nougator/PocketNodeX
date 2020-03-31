@@ -16,51 +16,51 @@ const TextFormat = require("../utils/TextFormat");
 const TerminalTextFormat = require("../utils/TerminalTextFormat");
 
 class Logger {
-    constructor(caller, subcaller = ""){
+    constructor(caller, subcaller = "") {
         this.debuggingLevel = 0;
         this.caller = caller;
         this.subcaller = subcaller !== "" ? " " + subcaller : "";
     }
 
-    emergency(){
+    emergency() {
         return this.log("Emergency", arguments, TerminalTextFormat.RED);
     }
 
-    alert(){
+    alert() {
         return this.log("Alert", arguments, TerminalTextFormat.RED);
     }
 
-    critical(){
+    critical() {
         return this.log("Critical", arguments, TerminalTextFormat.RED);
     }
 
-    error(){
+    error() {
         return this.log("Error", arguments, TerminalTextFormat.DARK_RED);
     }
 
-    warning(){
+    warning() {
         return this.log("Warning", arguments, TerminalTextFormat.YELLOW);
     }
 
-    notice(){
+    notice() {
         return this.log("Notice", arguments, TerminalTextFormat.AQUA);
     }
 
-    info(){
+    info() {
         return this.log("Info", arguments, TerminalTextFormat.WHITE);
     }
 
-    debug(){
-        if(this.debuggingLevel < 1) return;
+    debug() {
+        if (this.debuggingLevel < 1) return;
         return this.log("Debug", arguments, TerminalTextFormat.GRAY);
     }
 
-    debugExtensive(){
-        if(this.debuggingLevel < 2) return;
+    debugExtensive() {
+        if (this.debuggingLevel < 2) return;
         return this.log("Debug", arguments, TerminalTextFormat.GRAY);
     }
 
-    logError(error){
+    logError(error) {
         error = error.stack.split("\n");
         this.error(error.shift());
         error.forEach(trace => this.debug(trace));
@@ -71,19 +71,19 @@ class Logger {
      * @param messages Array
      * @param color    TerminalTextFormat.COLOR
      */
-    log(level, messages, color = TerminalTextFormat.GRAY){
-        if(messages.length === 0) return;
+    log(level, messages, color = TerminalTextFormat.GRAY) {
+        if (messages.length === 0) return;
 
         messages = Array.from(messages).map(message => (typeof message === "string" ? TextFormat.toTerminal(message) : message) + TerminalTextFormat.RESET);
 
-        log(TerminalTextFormat.BLUE + "[" + TimeStamp("HH:mm:ss") + "]" + TerminalTextFormat.RESET + " " + color +"[" + this.caller + " > " + level + "]:" + this.subcaller, messages);
+        log(TerminalTextFormat.BLUE + "[" + TimeStamp("HH:mm:ss") + "]" + TerminalTextFormat.RESET + " " + color + "[" + this.caller + " > " + level + "]:" + this.subcaller, messages);
 
-        function log(prefix, args){
+        function log(prefix, args) {
             console.log(prefix, ...args);
         }
     }
 
-    setDebugging(level){
+    setDebugging(level) {
         this.debuggingLevel = level;
 
         return this;

@@ -1,8 +1,8 @@
 const CommandParameter = require("./CommandParameter");
 
-class CommandData{
+class CommandData {
 
-    constructor(){
+    constructor() {
         /** @type {string} */
         this.commandName = "";
         /** @type {string} */
@@ -17,4 +17,5 @@ class CommandData{
         this.overloads = [];
     }
 }
+
 module.exports = CommandData;

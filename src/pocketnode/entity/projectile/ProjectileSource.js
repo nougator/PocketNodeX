@@ -1,4 +1,4 @@
-class ProjectileSource{
+class ProjectileSource {
 
 }
 

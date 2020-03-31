@@ -5,9 +5,17 @@ const Vector3 = require("../math/Vector3");
 const Player = require("../player/Player");
 const Item = require("../item/Item");
 
-class Block extends multiple(Position, BlockIds){
+class Block extends multiple(Position, BlockIds) {
 
-    initVars(){
+    constructor(id, meta = 0, name = null, itemId = null) {
+        super();
+        this._id = id;
+        this._meta = meta;
+        this._fallbackName = name;
+        this._itemId = itemId;
+    }
+
+    initVars() {
         this._id = -1;
         this._meta = 0;
         this._fallbackName = "";
@@ -18,25 +26,17 @@ class Block extends multiple(Position, BlockIds){
         this._collisionBoxes = null;
     }
 
-    constructor(id, meta = 0, name = null, itemId = null){
-        super();
-        this._id = id;
-        this._meta = meta;
-        this._fallbackName = name;
-        this._itemId = itemId;
-    }
-
     /**
      * @return {string}
      */
-    getName(){
+    getName() {
         return this._fallbackName || "Unknown";
     }
 
     /**
      * @return {number}
      */
-    getId(){
+    getId() {
         return this._id;
     }
 
@@ -46,26 +46,26 @@ class Block extends multiple(Position, BlockIds){
      *
      * @return {number}
      */
-    getItemId(){
+    getItemId() {
         return this._itemId || this.getId();
     }
 
     /**
      * @return {number}
      */
-    getRuntimeId(){
+    getRuntimeId() {
         //TODO: return RuntimeBlockMapping.to
     }
 
     /**
      * @return {number}
      */
-    getDamage(){
+    getDamage() {
         return this._meta;
     }
 
-    setDamage(meta){
-        if (meta < 0 || meta > 0xf){
+    setDamage(meta) {
+        if (meta < 0 || meta > 0xf) {
             console.log(`Block damage values must be 0-15, not ${meta}`);
         }
         this._meta = meta;
@@ -80,7 +80,7 @@ class Block extends multiple(Position, BlockIds){
      *
      * @return {number}
      */
-    getVariantBitmask(){
+    getVariantBitmask() {
         return -1;
     }
 
@@ -88,7 +88,7 @@ class Block extends multiple(Position, BlockIds){
      * Returns the block meta, stripped of non-variant flags.
      * @return {number}
      */
-    getVariant(){
+    getVariant() {
         return this._meta & this.getVariantBitmask();
     }
 
@@ -96,14 +96,14 @@ class Block extends multiple(Position, BlockIds){
      * AKA: Block->isPlaceable
      * @return {boolean}
      */
-    canBePlaced(){
+    canBePlaced() {
         return true;
     }
 
     /**
      * @return {boolean}
      */
-    canBeReplaced(){
+    canBeReplaced() {
         return false;
     }
 
@@ -114,7 +114,7 @@ class Block extends multiple(Position, BlockIds){
      * @param isClickedBlock {boolean}
      * @return {boolean}
      */
-    canBePlacedAt(blockReplace, clickVector, face, isClickedBlock){
+    canBePlacedAt(blockReplace, clickVector, face, isClickedBlock) {
         return blockReplace.canBeReplaced();
     }
 
@@ -129,7 +129,7 @@ class Block extends multiple(Position, BlockIds){
      * @param player {Player}
      * @return {boolean}
      */
-    place(item, blockReplace, blockClicked, face, clickVector, player = null){
+    place(item, blockReplace, blockClicked, face, clickVector, player = null) {
         return this.getLevel().setBlock(this, this, true, true);
     }
 
@@ -138,7 +138,7 @@ class Block extends multiple(Position, BlockIds){
      *
      * @param v {Position}
      */
-    position(v){
+    position(v) {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
@@ -150,10 +150,11 @@ class Block extends multiple(Position, BlockIds){
      * Clears any cached precomputed objects, such as bounding boxes. This is called on block neighbour update and when
      * the block is set into the world to remove any outdated precomputed things such as AABBs and force recalculation.
      */
-    clearCaches(){
+    clearCaches() {
         this._boundingBox = null;
         this._collisionBoxes = null;
     }
 
 }
+
 module.exports = Block;

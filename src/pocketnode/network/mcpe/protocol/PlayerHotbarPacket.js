@@ -15,4 +15,5 @@ class PlayerHotbarPacket extends DataPacket {
 
     }
 }
+
 module.exports = PlayerHotbarPacket;

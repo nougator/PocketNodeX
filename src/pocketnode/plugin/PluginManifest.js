@@ -1,7 +1,12 @@
 const PluginException = require("./PluginException");
 
 class PluginManifest {
-    initVars(){
+    constructor(data) {
+        this.initVars();
+        this.setManifest(((data instanceof Object) ? data : JSON.parse(data)));
+    }
+
+    initVars() {
         this.name = "";
         this.main = "";
         this.api = [];
@@ -17,14 +22,9 @@ class PluginManifest {
         this.order = 0;//todo: implement this
     }
 
-    constructor(data){
-        this.initVars();
-        this.setManifest(((data instanceof Object) ? data : JSON.parse(data)));
-    }
-
-    setManifest(data){
+    setManifest(data) {
         this.name = data.name.replace(/[^A-Za-z0-9 _.-]/g, "");
-        if(this.name === ""){
+        if (this.name === "") {
             throw new PluginException("Invalid PluginManifest name!");
         }
         this.name = this.name.replace(" ", "_");
@@ -33,42 +33,42 @@ class PluginManifest {
         this.api = Array.isArray(data.api) ? data.api : [data.api];
         this.description = data.description;
         this.website = data.website;
-        if(typeof data.author !== "undefined"){
+        if (typeof data.author !== "undefined") {
             this.authors.push(data.author);
-        }else if(typeof data.authors !== "undefined"){
+        } else if (typeof data.authors !== "undefined") {
             this.authors = data.authors;
         }
     }
 
-    getFullName(){
+    getFullName() {
         return this.name + " v" + this.version;
     }
 
-    getName(){
+    getName() {
         return this.name;
     }
 
-    getCompatibleApis(){
+    getCompatibleApis() {
         return this.api;
     }
 
-    getAuthors(){
+    getAuthors() {
         return this.authors;
     }
 
-    getDescription(){
+    getDescription() {
         return this.description;
     }
 
-    getMain(){
+    getMain() {
         return this.main;
     }
 
-    getVersion(){
+    getVersion() {
         return this.version;
     }
 
-    getWebsite(){
+    getWebsite() {
         return this.website;
     }
 }

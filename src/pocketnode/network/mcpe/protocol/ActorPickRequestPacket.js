@@ -3,20 +3,20 @@ const ProtocolInfo = require("../Info");
 
 class ActorPickRequestPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.ACTOR_PICK_REQUEST_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.entityUniqueId = -1;
         /** @type {number} */
         this.hotbarSlot = -1;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -33,4 +33,5 @@ class ActorPickRequestPacket extends DataPacket {
         return session.handleActorPickRequest(this);
     }
 }
+
 module.exports = ActorPickRequestPacket;

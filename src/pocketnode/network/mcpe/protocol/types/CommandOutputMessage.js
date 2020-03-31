@@ -1,6 +1,6 @@
-class CommandOutputMessage{
+class CommandOutputMessage {
 
-    constructor(){
+    constructor() {
         /** @type {boolean} */
         this.isInternal = false;
         /** @type {string} */

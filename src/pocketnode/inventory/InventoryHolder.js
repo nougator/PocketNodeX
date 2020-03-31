@@ -12,12 +12,13 @@
 
 const Inventory = require("./Inventory");
 
-class InventoryHolder{
+class InventoryHolder {
 
     /**
      * @return {Inventory}
      */
-    getInventory(){};
+    getInventory() {
+    };
 }
 
 module.exports = InventoryHolder;

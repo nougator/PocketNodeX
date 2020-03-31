@@ -13,7 +13,7 @@
 const Generator = require("./Generator");
 
 class GeneratorManager {
-    constructor(){
+    constructor() {
         /**
          * @type {Map<String, Generator>} */
         this._generators = new Map();
@@ -24,8 +24,8 @@ class GeneratorManager {
      * @param generator {Generator}
      * @return {Boolean}
      */
-    addGenerator(name, generator){
-        if(generator.prototype instanceof Generator && this._generators.has(name.toLowerCase())){
+    addGenerator(name, generator) {
+        if (generator.prototype instanceof Generator && this._generators.has(name.toLowerCase())) {
             this._generators.set(name.toLowerCase(), generator);
 
             return true;
@@ -37,7 +37,7 @@ class GeneratorManager {
     /**
      * @return {Array<String>}
      */
-    getGeneratorList(){
+    getGeneratorList() {
         return Array.from(this._generators.keys());
     }
 
@@ -45,8 +45,8 @@ class GeneratorManager {
      * @param name {String}
      * @return {Generator|null}
      */
-    getGenerator(name){
-        if(this._generators.has(name = name.toLowerCase())){
+    getGenerator(name) {
+        if (this._generators.has(name = name.toLowerCase())) {
             return this._generators.get(name);
         }
 
@@ -57,9 +57,9 @@ class GeneratorManager {
      * @param generator {Generator}
      * @return {String}
      */
-    getGeneratorName(generator){
-        for(let [name, gen] of this._generators){
-            if(gen === generator){
+    getGeneratorName(generator) {
+        for (let [name, gen] of this._generators) {
+            if (gen === generator) {
                 return name;
             }
         }
@@ -67,7 +67,7 @@ class GeneratorManager {
         return "unknown";
     }
 
-    isGenerator(gen){
+    isGenerator(gen) {
         return gen.prototype instanceof Generator;
     }
 }

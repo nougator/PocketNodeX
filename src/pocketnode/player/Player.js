@@ -3,8 +3,17 @@ const UUID = require("../utils/UUID");
 const Isset = require("../utils/methods/Isset");
 const TextFormat = require("../utils/TextFormat");
 const Base64 = require("../utils/Base64");
-const SkinAnimation = require("../utils/SkinAnimation");
-const SerializedImage = require("../utils/SerializedImage");
+const SkinAnimation = require("../network/mcpe/protocol/types/SkinAnimation");
+const SkinImage = require("../network/mcpe/protocol/types/SkinImage");
+const SkinData = require('../network/mcpe/protocol/types/SkinData');
+const SkinAdapterSingleton = require('../network/mcpe/protocol/types/SkinAdapterSingleton');
+const Chunk = require('../level/format/Chunk');
+
+const Async = require("../utils/Async");
+
+const AddActorPacket = require("../network/mcpe/protocol/AddActorPacket");
+
+// const SerializedImage = require("../utils/SerializedImage");
 
 /* Events */
 const PlayerJoinEvent = require("../event/player/PlayerJoinEvent");
@@ -34,8 +43,8 @@ const ResourcePacksInfoPacket = require("../network/mcpe/protocol/ResourcePacksI
 const StartGamePacket = require("../network/mcpe/protocol/StartGamePacket");
 const ChunkRadiusUpdatedPacket = require("../network/mcpe/protocol/ChunkRadiusUpdatedPacket");
 const TextPacket = require("../network/mcpe/protocol/TextPacket");
-const LevelChunkPacket =  require("../network/mcpe/protocol/LevelChunkPacket");
-const SetPlayerGameTypePacket =  require("../network/mcpe/protocol/SetPlayerGameTypePacket");
+const LevelChunkPacket = require("../network/mcpe/protocol/LevelChunkPacket");
+const SetPlayerGameTypePacket = require("../network/mcpe/protocol/SetPlayerGameTypePacket");
 const AvailableCommandsPacket = require("../network/mcpe/protocol/AvailableCommandsPacket");
 const SetTitlePacket = require("../network/mcpe/protocol/SetTitlePacket");
 const ActorEventPacket = require("../network/mcpe/protocol/ActorEventPacket");
@@ -57,21 +66,54 @@ const AxisAlignedBB = require("../math/AxisAlignedBB");
 const Human = require("../entity/Human");
 const Skin = require("../entity/Skin");
 
-/* NBT */
-const CompoundTag = require("../nbt/tag/CompoundTag");
-
 const ResourcePack = require("../resourcepacks/ResourcePack");
 
 /**
  * Main class that handles networking, recovery, and packet sending to the server part
  */
-class Player extends multiple(Human, CommandSender) {
+class Player extends Human {
+    constructor(sourceInterface, server, clientId, ip, port) {
+        super(server);
+        this.initVars();
+        this._interface = sourceInterface;
+        this.server = server;
+        this._clientId = clientId;
+        this._ip = ip;
+        this._port = port;
+        this.creationTime = Date.now();
+        this.level = server.getDefaultLevel();
 
-    static get SURVIVAL(){return 0}
-    static get CREATIVE(){return 1}
-    static get ADVENTURE(){return 2}
-    static get SPECTATOR(){return 3}
-    static get VIEW(){return Player.SPECTATOR}
+        //this.namedtag = new CompoundTag();
+        this._boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0, 0);
+        //
+        // this._uuid = null;
+        // this._rawUUID = null;
+
+        //TODO: this.onGround = this.namedtag.getByte("onGround", 0) !== 0;
+
+        this._sessionAdapter = new PlayerSessionAdapter(this);
+        this.lastUpdate = this.server.getTick();
+    }
+
+    static get SURVIVAL() {
+        return 0
+    }
+
+    static get CREATIVE() {
+        return 1
+    }
+
+    static get ADVENTURE() {
+        return 2
+    }
+
+    static get SPECTATOR() {
+        return 3
+    }
+
+    static get VIEW() {
+        return Player.SPECTATOR
+    }
 
     /**
      * Validates the given username.
@@ -80,15 +122,24 @@ class Player extends multiple(Human, CommandSender) {
      *
      * @return {boolean}
      */
-    static isValidUserName(name){
-        if (name == null){
+    static isValidUserName(name) {
+        if (name == null) {
             return false;
         }
 
         return name.toLowerCase() !== "rcon" && name.toLowerCase() !== "console" && name.length >= 1 && name.length <= 16 && /[^A-Za-z0-9_ ]/.test(name);
     }
 
-    initVars(){
+    static getClientFriendlyGamemode(gamemode) {
+        gamemode &= 0x03;
+        if (gamemode === Player.SPECTATOR) {
+            return Player.CREATIVE;
+        }
+
+        return gamemode;
+    }
+
+    initVars() {
 
         //TODO: /** @type {SourceInterface} */
         this._interface = null;
@@ -151,8 +202,8 @@ class Player extends multiple(Human, CommandSender) {
     /**
      * @return {string}
      */
-    getLeaveMessage(){
-        if(this.joined){
+    getLeaveMessage() {
+        if (this.joined) {
             return TextFormat.YELLOW + this.getName() + " has left the game";
         }
         return "";
@@ -164,51 +215,51 @@ class Player extends multiple(Human, CommandSender) {
      *
      * @return {number}
      */
-    getClientId(){
+    getClientId() {
         return this._randomClientId;
     }
 
     /**
      * @return {boolean}
      */
-    isBanned(){
+    isBanned() {
         this.server.getNameBans().isBanned(this._username);
     }
 
     /**
      * @param value {boolean}
      */
-    setBanned(value){
-        if (value){
-            this.server.getNameBans().addBan(this.getName(), null, null, null);
-            this.kick("You have been banned");
-        }else{
-            this.server.getNameBans().remove(this.getName());
-        }
-    }
+    // setBanned(value) {
+    //     if (value) {
+    //         this.server.getNameBans().addBan(this.getName(), null, null, null);
+    //         this.kick("You have been banned");
+    //     } else {
+    //         this.server.getNameBans().remove(this.getName());
+    //     }
+    // }
 
     /**
      * @return {boolean}
      */
-    isWhitelisted(){
+    isWhitelisted() {
         return this.server.isWhitelisted(this._username);
     }
 
     /**
      * @param value {boolean}
      */
-    setWhitelisted(value){
-        if(value){
-            this.server.addWhitelist(this._username);
-        }else {
-            this.server.removeWhitelist(this._username);
-        }
-    }
+    // setWhitelisted(value) {
+    //     if (value) {
+    //         this.server.addWhitelist(this._username);
+    //     } else {
+    //         this.server.removeWhitelist(this._username);
+    //     }
+    // }
 
     /**
      * @return {boolean}
      */
-    isAuthenticated(){
+    isAuthenticated() {
         return this._xuid !== "";
     }
 
@@ -217,7 +268,7 @@ class Player extends multiple(Human, CommandSender) {
      * the player is not logged into Xbox Live.
      * @return {string}
      */
-    getXuid(){
+    getXuid() {
         return this._xuid;
     }
 
@@ -245,57 +296,35 @@ class Player extends multiple(Human, CommandSender) {
     /**
      * @return {Player}
      */
-    getPlayer(){
+    getPlayer() {
         return this;
     }
 
-    getFirstPlayed(){
+    getFirstPlayed() {
         return this.name
     }
 
-    constructor(server, clientId, ip, port){
-        super(server, new CompoundTag());
-        this.initVars();
-        this.server = server;
-        this._clientId = clientId;
-        this._ip = ip;
-        this._port = port;
-        this.creationTime = Date.now();
-        this.level = server.getDefaultLevel();
-
-        //this.namedtag = new CompoundTag();
-        this._boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0, 0);
-        //
-        // this._uuid = null;
-        // this._rawUUID = null;
-
-        //TODO: this.onGround = this.namedtag.getByte("onGround", 0) !== 0;
-
-        this._sessionAdapter = new PlayerSessionAdapter(this);
-        this.lastUpdate = this.server.getTick();
-    }
-
-    isConnected(){
+    isConnected() {
         return this._sessionAdapter !== null;
     }
 
-    hasPlayedBefore(){
+    hasPlayedBefore() {
         return this._playedBefore;
     }
 
-    getName(){
+    getName() {
         return this._username;
     }
 
-    getLowerCaseName(){
+    getLowerCaseName() {
         return this._iusername;
     }
 
-    getAddress(){
+    getAddress() {
         return this._ip;
     }
 
-    getPort(){
+    getPort() {
         return this._port;
     }
 
@@ -326,39 +355,46 @@ class Player extends multiple(Human, CommandSender) {
         this._displayName = this._username;
         this._iusername = this._username.toLowerCase();
 
-        if (packet.locale !== null){
+        if (packet.locale !== null) {
             this.locale = packet.locale;
         }
 
-        if (this.server.isFull() && this.kick("Server Full", false)){
+        if (this.server.isFull() && this.kick("Server Full", false)) {
             return true;
         }
 
         this._randomClientId = packet.clientId;
 
         this._uuid = UUID.fromString(packet.clientUUID);
-        this._rawUUID = this._uuid.toBinary();
+        // this._rawUUID = this._uuid.toBinary(); to fix
 
         let animations = [];
-        packet.clientData["AnimatedImageData"].forEach(animatedData => {
-            animations.push(new SkinAnimation(new SerializedImage(animatedData["ImageWidth"], animatedData["ImageHeight"], Base64.decode(animatedData["Image"])), animatedData["Type"], animatedData["Frames"]));
+        packet.clientData['AnimatedImageData'].forEach(animation => {
+            animations.push(new SkinAnimation(new SkinImage(
+                animation['ImageHeight'],
+                animation['ImageWidth'],
+                Base64.decode(animation['Image'], true)),
+                animation['Type'], animation['Frames']
+            ));
         });
 
-        let skin = new Skin(
-            packet.clientData["SkinId"],
-            Base64.decode(packet.clientData["SkinResourcePatch"] || ""),
-            new SerializedImage(packet.clientData["SkinImageHeight"], packet.clientData["SkinImageWidth"], Base64.decode(packet.clientData["SkinData" || ""])),
+        let skinData = new SkinData(
+            packet.clientData['SkinId'],
+            Base64.decode(packet.clientData['SkinResourcePatch'] || "", true),
+            new SkinImage(packet.clientData['SkinImageHeight'], packet.clientData['SkinImageWidth'], Base64.decode(packet.clientData['SkinData'], true)),
             animations,
-            new SerializedImage(packet.clientData["CapeImageHeight"], packet.clientData["CapeImageWidth"], Base64.decode(packet.clientData["CapeData"] || "")),
-            Base64.decode(packet.clientData["SkinGeometryData"] || ""),
-            Base64.decode(packet.clientData["SkinAnimationData"] || ""),
-            packet.clientData["PremiumSkin"] || false,
-            packet.clientData["PersonaSkin"] || false,
-            packet.clientData["CapeOnClassicSkin"] || false,
-            packet.clientData["CapeId"] || ""
+            new SkinImage(packet.clientData['CapeImageHeight'], packet.clientData['CapeImageWidth'], Base64.decode(packet.clientData['CapeData'] || "", true)),
+            Base64.decode(packet.clientData['SkinGeometryData'] || "", true),
+            Base64.decode(packet.clientData['SkinAnimationData'] || "", true),
+            packet.clientData['PremiumSkin'] || false,
+            packet.clientData['PersonaSkin'] || false,
+            packet.clientData['CapeOnClassicSkin'] || false,
+            packet.clientData['CapeId'] || ""
         );
 
-        if(!skin.isValid()){
+        let skin = SkinAdapterSingleton.get().fromSkinData(skinData);
+
+        if (!skin.isValid()) {
             this.close("", "Invalid Skin");
             return true;
         }
@@ -367,7 +403,7 @@ class Player extends multiple(Human, CommandSender) {
 
         // let ev = new PlayerPreLoginEvent(this, "Test");
         // this.server.getPluginManager().callEvent(ev);
-        
+
         // if (ev.isCancelled()) {
         //      this.close("", ev.getKickMessage());
         //      return true;
@@ -388,7 +424,7 @@ class Player extends multiple(Human, CommandSender) {
         return true;
     }
 
-    doFirstSpawn(){
+    doFirstSpawn() {
         this.spawned = true;
 
         //this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
@@ -403,33 +439,32 @@ class Player extends multiple(Human, CommandSender) {
         this.noDamageTicks = 60;
     }
 
+    onVerifyCompleted(packet, error, signedByMojang) {
+        if (this.closed) return;
 
-    onVerifyCompleted(packet, error, signedByMojang){
-        if(this.closed) return;
-        
         if (error !== null) {
             this.close("", "Invalid Session");
             return;
         }
 
         let xuid = packet.xuid;
-        
+
         if (!signedByMojang && xuid !== "") {
             this.server.getLogger().info(this.getName() + " has an XUID, but their login keychain is not signed by Mojang");
             xuid = "";
         }
-        
-        if (xuid === "" || !xuid instanceof String){
-            if (signedByMojang){
+
+        if (xuid === "" || !xuid instanceof String) {
+            if (signedByMojang) {
                 this.server.getLogger().error(this.getName() + " should have an XUID, but none found");
             }
 
-            if(this.server.requiresAuthentication() && this.kick("This server requires authentication.", false)){
+            if (this.server.requiresAuthentication() && this.kick("This server requires authentication.", false)) {
                 return;
             }
 
             this.server.getLogger().debug(this.getName() + " is NOT logged into Xbox Live");
-        }else {
+        } else {
             this.server.getLogger().debug(this.getName() + " is logged into Xbox Live");
             this._xuid = xuid;
         }
@@ -439,40 +474,39 @@ class Player extends multiple(Human, CommandSender) {
         this._processLogin();
     }
 
-    _processLogin(){
-        for(let [,p] of this.server._loggedInPlayers){
-            if(p !== this && p._iusername === this._iusername){
-                if(p.kick("Logged in from another location") === false){
-                    this.close(this.getLeaveMessage(), "Logged in from another location");
-                    return;
-                }
-            }else if(p.loggedIn/* && uuids equal*/){
-                if(p.kick("Logged in from another location") === false){
-                    this.close(this.getLeaveMessage(), "Logged in from another location");
-                    return;
-                }
-            }
-        }
+    _processLogin() {
+        // for (let [, p] of this.server._loggedInPlayers) {
+        //     if (p !== this && p._iusername === this._iusername) {
+        //         if (p.kick("Logged in from another location") === false) {
+        //             this.close(this.getLeaveMessage(), "Logged in from another location");
+        //             return;
+        //         }
+        //     } else if (p.loggedIn/* && uuids equal*/) {
+        //         if (p.kick("Logged in from another location") === false) {
+        //             this.close(this.getLeaveMessage(), "Logged in from another location");
+        //             return;
+        //         }
+        //     }
+        // }
 
         this.sendPlayStatus(PlayStatusPacket.LOGIN_SUCCESS);
 
         this.loggedIn = true;
         this.server.onPlayerLogin(this);
-        console.log("Player logged in: "+this._username);
+        console.log("Player logged in: " + this._username);
 
         let pk = new ResourcePacksInfoPacket();
-        let manager = this.server.getResourcePackManager();
-        pk.resourcePackEntries = manager.getResourcePacks();
-        pk.mustAccept = manager.resourcePacksRequired();
+        pk.resourcePackEntries = [];
+        pk.mustAccept = false;
         this.dataPacket(pk);
     }
 
-    sendPlayStatus(status, immediate = false){
+    sendPlayStatus(status, immediate = false) {
         let pk = new PlayStatusPacket();
         pk.status = status;
-        if(immediate){
+        if (immediate) {
             this.directDataPacket(pk);
-        }else{
+        } else {
             this.dataPacket(pk);
         }
     }
@@ -483,28 +517,27 @@ class Player extends multiple(Human, CommandSender) {
      * @param newSkinName {string}
      * @param oldSkinName {string}
      */
-    changeSkin(skin, newSkinName, oldSkinName){
-        if (!skin.isValid()){
+    changeSkin(skin, newSkinName, oldSkinName) {
+        if (!skin.isValid()) {
             return false;
         }
 
         //TODO: finish handle
     }
 
-    dataPacket(packet, needACK = false){
+    dataPacket(packet, needACK = false) {
         return this.sendDataPacket(packet, needACK, false);
     }
 
-    directDataPacket(packet, needACK = false){
+    directDataPacket(packet, needACK = false) {
         return this.sendDataPacket(packet, needACK, true);
     }
 
-    sendDataPacket(packet, needACK = false, immediate = false){
-        CheckTypes([DataPacket, packet], [Boolean, needACK], [Boolean, immediate]);
-        if(!this.isConnected()) return false;
+    sendDataPacket(packet, needACK = false, immediate = false) {
+        if (!this.isConnected()) return false;
 
-        if(!this.loggedIn && !packet.canBeSentBeforeLogin()){
-            throw new Error("Attempted to send "+packet.getName()+" to "+this.getName()+" before they got logged in.");
+        if (!this.loggedIn && !packet.canBeSentBeforeLogin()) {
+            throw new Error("Attempted to send " + packet.getName() + " to " + this.getName() + " before they got logged in.");
         }
 
         // let ev = new DataPacketSendEvent(this, packet);
@@ -513,9 +546,9 @@ class Player extends multiple(Human, CommandSender) {
         //     return false;
         // }
 
-        let identifier = this.getSessionAdapter().sendPacket(packet, needACK, immediate);
+        let identifier = this._interface.putPacket(this, packet, needACK, immediate);
 
-        if(needACK && identifier !== null){
+        if (needACK && identifier !== null) {
             this._needACK[identifier] = false;
             return identifier;
         }
@@ -523,18 +556,18 @@ class Player extends multiple(Human, CommandSender) {
         return true;
     }
 
-    kick(reason = "", isAdmin = true){
+    kick(reason = "", isAdmin = true) {
         let message;
-        if(isAdmin){
-            if(true){//todo: not is banned
+        if (isAdmin) {
+            if (true) {//todo: not is banned
                 message = "Kicked by admin." + (reason !== "" ? " Reason: " + reason : "");
-            }else{
+            } else {
                 message = reason;
             }
-        }else{
-            if(reason === ""){
+        } else {
+            if (reason === "") {
                 message = "Unknown Reason.";
-            }else{
+            } else {
                 message = reason;
             }
         }
@@ -553,7 +586,7 @@ class Player extends multiple(Human, CommandSender) {
      */
     addTitle(title, subtitle = "", fadeIn = -1, stay = -1, fadeOut = -1) {
         this.setTitleDuration(fadeIn, stay, fadeOut);
-        if (subtitle !== ""){
+        if (subtitle !== "") {
             this.addSubTitle(subtitle);
         }
         this.sendTitleText(title, SetTitlePacket.TYPE_SET_TITLE);
@@ -564,7 +597,7 @@ class Player extends multiple(Human, CommandSender) {
      *
      * @param subtitle {string}
      */
-    addSubTitle(subtitle){
+    addSubTitle(subtitle) {
         this.sendTitleText(subtitle, SetTitlePacket.TYPE_SET_SUBTITLE);
     }
 
@@ -573,14 +606,14 @@ class Player extends multiple(Human, CommandSender) {
      *
      * @param message {string}
      */
-    addActionBarMessage(message){
+    addActionBarMessage(message) {
         this.sendTitleText(message, SetTitlePacket.TYPE_SET_ACTIONBAR_MESSAGE);
     }
 
     /**
      * Removes the title from the client's screen.
      */
-    removeTitles(){
+    removeTitles() {
         let pk = new SetTitlePacket();
         pk.type = SetTitlePacket.TYPE_CLEAR_TITLE;
         this.dataPacket(pk);
@@ -589,14 +622,14 @@ class Player extends multiple(Human, CommandSender) {
     /**
      * Resets the title duration settings to defaults and removes any existing titles.
      */
-    resetTitles(){
+    resetTitles() {
         let pk = new SetTitlePacket();
         pk.type = SetTitlePacket.TYPE_RESET_TITLE;
         this.dataPacket(pk);
     }
 
-    setTitleDuration(fadeIn, stay, fadeOut){
-        if (fadeIn >= 0 && stay >= 0 && fadeOut >= 0){
+    setTitleDuration(fadeIn, stay, fadeOut) {
+        if (fadeIn >= 0 && stay >= 0 && fadeOut >= 0) {
             let pk = new SetTitlePacket();
             pk.type = SetTitlePacket.TYPE_SET_ANIMATION_TIMES;
             pk.fadeInTime = fadeIn;
@@ -606,14 +639,28 @@ class Player extends multiple(Human, CommandSender) {
         }
     }
 
-    close(message, reason = "generic reason", notify = true){
-        if(this.isConnected() && !this.closed){
-            try{
-                if(notify && reason.length > 0){
+    sendSpawnPacket(player){
+        let pk = new AddActorPacket();
+        pk.entityRuntimeId = this.id;
+        pk.type = 63;
+        pk.position = this.asVector3();
+        pk.motion = this._motion;
+        pk.yaw = this.yaw;
+        pk.headYaw = this.yaw;
+        pk.pitch = this.pitch;
+        pk.attributes = [];
+        pk.metadata = this._propertyManager.getAll();
+
+        player.dataPacket(pk);
+    }
+
+    close(message, reason = "generic reason", notify = true) {
+        if (this.isConnected() && !this.closed) {
+            try {
+                if (notify && reason.length > 0) {
                     let pk = new DisconnectPacket();
                     pk.message = reason;
-                    this.dataPacket(pk);
-                    //TODO: fix. this.directDataPacket(pk);
+                    this.directDataPacket(pk);
                 }
 
                 this._sessionAdapter = null;
@@ -621,11 +668,11 @@ class Player extends multiple(Human, CommandSender) {
                 //unsub from perms?
                 //stopsleep
 
-                if(this.joined){
-                    try{
+                if (this.joined) {
+                    try {
                         //save player data
-                    }catch(e){
-                        this.server.getLogger().error("Failed to save player data for "+this.getName());
+                    } catch (e) {
+                        this.server.getLogger().error("Failed to save player data for " + this.getName());
                         this.server.getLogger().logError(e);
                     }
 
@@ -635,7 +682,7 @@ class Player extends multiple(Human, CommandSender) {
 
                 //if valid do chuck stuff
 
-                if(this.loggedIn){
+                if (this.loggedIn) {
                     this.server.onPlayerLogout(this);
                     //can see etc
                 }
@@ -644,7 +691,7 @@ class Player extends multiple(Human, CommandSender) {
 
                 let ev = new PlayerQuitEvent(this, "A Player quit due to " + reason, reason);
                 this.server.getEventSystem().callEvent(ev);
-                if(ev.getQuitMessage().length > 0){
+                if (ev.getQuitMessage().length > 0) {
                     let message = ev.getQuitMessage();
                     this.server.broadcastMessage(message);
                 } else {
@@ -653,20 +700,20 @@ class Player extends multiple(Human, CommandSender) {
 
                 this.server.getLogger().info(TextFormat.AQUA + this.getName() + TextFormat.WHITE + " (" + this._ip + ":" + this._port + ") has disconnected due to " + reason);
 
-                if(this.loggedIn){
+                if (this.loggedIn) {
                     this.loggedIn = false;
                     this.server.removeOnlinePlayer(this);
                 }
-            }catch(e){
+            } catch (e) {
                 this.server.getLogger().logError(e);
-            }finally{
+            } finally {
                 this.server.getRakNetAdapter().close(this, notify ? reason : "");
                 this.server.removePlayer(this);
             }
         }
     }
 
-    setViewDistance(distance){
+    setViewDistance(distance) {
         this._viewDistance = distance;
 
         let pk = new ChunkRadiusUpdatedPacket();
@@ -676,64 +723,58 @@ class Player extends multiple(Human, CommandSender) {
         console.log("Setting view distance for " + this.getName() + " to " + distance);
     }
 
-    getViewDistance(){
+    getViewDistance() {
         return this._viewDistance;
     }
 
-    completeLoginSequence(){
+    completeLoginSequence() {
 
         //let pos = this.namedtag.getListTag("Pos").getAllValues();
         //this.usedChunks[Level.chunkHash(pos[0] >> 4, pos[2]) >> 4] = false;
 
-        //create entity
-        this.server.getLogger().info([
-            TextFormat.AQUA + this.getName() + TextFormat.WHITE + " (" + this._ip + ":" + this._port + ")",
-            "is attempting to join"
-        ].join(" "));
-
         let pk = new StartGamePacket();
-        pk.entityUniqueId = this.id;
-        pk.entityRuntimeId = this.id;
-        pk.playerGamemode = Player.getClientFriendlyGamemode(this.gamemode);
-
-        pk.playerPosition = new Vector3(0, 5.5, 0);
-
-        pk.pitch = this._pitch;
-        pk.yaw = this._yaw;
-        pk.seed = 0xdeadbeef;
-        pk.dimension = 0; //TODO
-        pk.levelGamemode = this.server.getGamemode();
-        pk.difficulty = 1; //TODO
-        [pk.spawnX, pk.spawnY, pk.spawnZ] = [0, 6.5, 0];
-        pk.hasAchievementsDisabled = true;
-        pk.time = 0;
-        pk.eduEditionOffer = 0;
-        pk.rainLevel = 0;
-        pk.lightningLevel = 0;
-        pk.commandsEnabled = true;
-        pk.levelId = "";
-        pk.levelName = this.server.getMotd();
-        pk.gameRules = [
-            new GameRule(GameRule.COMMAND_BLOCK_OUTPUT, true),
-            new GameRule(GameRule.DO_DAYLIGHT_CYCLE, true),
-            new GameRule(GameRule.DO_ENTITY_DROPS, true),
-            new GameRule(GameRule.DO_FIRE_TICK, true),
-            new GameRule(GameRule.DO_MOB_LOOT, true),
-            new GameRule(GameRule.DO_MOB_SPAWNING, true),
-            new GameRule(GameRule.DO_TILE_DROPS, true),
-            new GameRule(GameRule.DO_WEATHER_CYCLE, true),
-            new GameRule(GameRule.DROWNING_DAMAGE, true),
-            new GameRule(GameRule.FALL_DAMAGE, true),
-            new GameRule(GameRule.FIRE_DAMAGE, true),
-            new GameRule(GameRule.KEEP_INVENTORY, false),
-            new GameRule(GameRule.MOB_GRIEFING, true),
-            new GameRule(GameRule.NATURAL_REGENERATION, true),
-            new GameRule(GameRule.PVP, true),
-            new GameRule(GameRule.SEND_COMMAND_FEEDBACK, true),
-            new GameRule(GameRule.SHOW_COORDINATES, true),
-            new GameRule(GameRule.RANDOM_TICK_SPEED, 3),
-            new GameRule(GameRule.TNT_EXPLODES, true)
-        ];
+        // pk.entityUniqueId = this.id;
+        // pk.entityRuntimeId = this.id;
+        // pk.playerGamemode = Player.getClientFriendlyGamemode(this.gamemode);
+        //
+        // pk.playerPosition = new Vector3(0, 5.5, 0);
+        //
+        // pk.pitch = this._pitch;
+        // pk.yaw = this._yaw;
+        // pk.seed = 0xdeadbeef;
+        // pk.dimension = 0; //TODO
+        // pk.levelGamemode = this.server.getGamemode();
+        // pk.difficulty = 1; //TODO
+        // [pk.spawnX, pk.spawnY, pk.spawnZ] = [0, 6.5, 0];
+        // pk.hasAchievementsDisabled = true;
+        // pk.time = 0;
+        // pk.eduEditionOffer = 0;
+        // pk.rainLevel = 0;
+        // pk.lightningLevel = 0;
+        // pk.commandsEnabled = true;
+        // pk.levelId = "";
+        // pk.levelName = this.server.getMotd();
+        // pk.gameRules = [
+        //     new GameRule(GameRule.COMMAND_BLOCK_OUTPUT, true),
+        //     new GameRule(GameRule.DO_DAYLIGHT_CYCLE, true),
+        //     new GameRule(GameRule.DO_ENTITY_DROPS, true),
+        //     new GameRule(GameRule.DO_FIRE_TICK, true),
+        //     new GameRule(GameRule.DO_MOB_LOOT, true),
+        //     new GameRule(GameRule.DO_MOB_SPAWNING, true),
+        //     new GameRule(GameRule.DO_TILE_DROPS, true),
+        //     new GameRule(GameRule.DO_WEATHER_CYCLE, true),
+        //     new GameRule(GameRule.DROWNING_DAMAGE, true),
+        //     new GameRule(GameRule.FALL_DAMAGE, true),
+        //     new GameRule(GameRule.FIRE_DAMAGE, true),
+        //     new GameRule(GameRule.KEEP_INVENTORY, false),
+        //     new GameRule(GameRule.MOB_GRIEFING, true),
+        //     new GameRule(GameRule.NATURAL_REGENERATION, true),
+        //     new GameRule(GameRule.PVP, true),
+        //     new GameRule(GameRule.SEND_COMMAND_FEEDBACK, true),
+        //     new GameRule(GameRule.SHOW_COORDINATES, true),
+        //     new GameRule(GameRule.RANDOM_TICK_SPEED, 3),
+        //     new GameRule(GameRule.TNT_EXPLODES, true)
+        // ];
         this.dataPacket(pk);
 
         this.sendDataPacket(new AvailableActorIdentifiersPacket());
@@ -741,87 +782,99 @@ class Player extends multiple(Human, CommandSender) {
 
         // this.level.sendTime(this);
 
-        //TODO: this.sendData(this);
+        // this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN, true);
 
         this.sendAttributes(true);
-        this.sendCommandData();
-        // this.sendSettings();
-        this.sendPotionEffects(this);
 
-        this._sendAllInventories();
+        this.server.getLogger().info([
+            TextFormat.AQUA + this.getName() + TextFormat.WHITE + " (" + this._ip + ":" + this._port + ")",
+            "is attempting to join"
+        ].join(" "));
+
+        //this.sendCommandData();
+        this.sendSettings();  // TODO: if i send this, i cannot see blocks
+        // this.sendPotionEffects(this);
+
+        // this._sendAllInventories();
 
         this.server.addOnlinePlayer(this);
         this.server.onPlayerCompleteLoginSequence(this);
 
-        //this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
+        // this.server.sendFullPlayerListData(this);
+
+        // this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
 
         let ev = new PlayerJoinEvent(this, TextFormat.YELLOW + this.getName() + " Joined the game!");
         this.server.getEventSystem().callEvent(ev);
-        if(ev.getJoinMessage().length > 0){
+        if (ev.getJoinMessage().length > 0) {
             this.server.broadcastMessage(ev.getJoinMessage());
         } else {
             this.server.getLogger().warning("Player join message is blank or null.");
         }
+        
+        // spawn to all
+        // this.server._playerList.forEach(player => {
+        //     if (player === this) return;
+        //     this.sendSpawnPacket(player);
+        // });
     }
 
-    sendCommandData(){
+    sendCommandData() {
         let pk = new AvailableCommandsPacket();
         this.server.getCommandMap().getCommands().forEach(command => {
-           for (let name in command) {
-               if (command.hasOwnProperty(name)) {
-                   if (Isset(pk.commandData[command.getName()]) || command.getName() === "help") {
-                       continue;
-                   }
+            for (let name in command) {
+                if (command.hasOwnProperty(name)) {
+                    if (Isset(pk.commandData[command.getName()]) || command.getName() === "help") {
+                        continue;
+                    }
 
-                   let data = new CommandData();
-                   //TODO: commands containing uppercase letters in the name crash 1.9.0 client
-                   data.commandName = command.getName().toLowerCase();
-                   data.commandDescription = command.getDescription();
-                   data.flags = 0;
-                   data.permission = 0;
+                    let data = new CommandData();
+                    //TODO: commands containing uppercase letters in the name crash 1.9.0 client
+                    data.commandName = command.getName().toLowerCase();
+                    data.commandDescription = command.getDescription();
+                    data.flags = 0;
+                    data.permission = 0;
 
-                   let parameter = new CommandParameter();
-                   parameter.paramName = "args";
-                   parameter.paramType = AvailableCommandsPacket.ARG_FLAG_VALID | AvailableCommandsPacket.ARG_TYPE_RAWTEXT;
-                   parameter.isOptional = true;
-                   data.overloads[0] = [];
-                   data.overloads[0][0] = parameter;
+                    let parameter = new CommandParameter();
+                    parameter.paramName = "args";
+                    parameter.paramType = AvailableCommandsPacket.ARG_FLAG_VALID | AvailableCommandsPacket.ARG_TYPE_RAWTEXT;
+                    parameter.isOptional = true;
+                    data.overloads[0] = [];
+                    data.overloads[0][0] = parameter;
 
-                   let aliases = command.getAliases();
-                   if (aliases.length !== 0) {
-                       if (aliases.indexOf(data.commandName) === -1) {
-                           //work around a client bug which makes the original name not show when aliases are used
-                           aliases.push(data.commandName);
-                       }
-                       data.aliases = new CommandEnum();
-                       data.aliases.enumName = command.getName().charAt(0).toUpperCase() + command.getName().substring(1) + "Aliases";
-                       data.aliases.enumValues = aliases;
-                   }
+                    let aliases = command.getAliases();
+                    if (aliases.length !== 0) {
+                        if (aliases.indexOf(data.commandName) === -1) {
+                            //work around a client bug which makes the original name not show when aliases are used
+                            aliases.push(data.commandName);
+                        }
+                        data.aliases = new CommandEnum();
+                        data.aliases.enumName = command.getName().charAt(0).toUpperCase() + command.getName().substring(1) + "Aliases";
+                        data.aliases.enumValues = aliases;
+                    }
 
-                   pk.commandData[command.getName()] = data;
-               }
-           }
+                    pk.commandData[command.getName()] = data;
+                }
+            }
         });
 
         this.dataPacket(pk);
     }
 
-    chat(message){
-        //console.log(message);
-
+    chat(message) {
         message = TextFormat.clean(message, false);//this._removeFormat);
 
         message = message.split("\n");
-        for(let i in message){
+        for (let i in message) {
             let messagePart = message[i];
-            if(messagePart.trim() !== "" && messagePart.length <= 255){// && this.messageCounter-- > 0){
-                if(messagePart.startsWith("./")){
+            if (messagePart.trim() !== "" && messagePart.length <= 255) {// && this.messageCounter-- > 0){
+                if (messagePart.startsWith("./")) {
                     messagePart = messagePart.substr(1);
                 }
 
-                if(messagePart.startsWith("/")){
+                if (messagePart.startsWith("/")) {
                     this.server.getCommandMap().dispatchCommand(this, messagePart.substr(1));
-                }else{
+                } else {
                     let msg = "<:player> :message".replace(":player", this.getName()).replace(":message", messagePart);
                     this.server.getLogger().info(msg);
                     this.server.broadcastMessage(msg);
@@ -832,20 +885,20 @@ class Player extends multiple(Human, CommandSender) {
         return true;
     }
 
-    handleAdventureSettings(packet){
+    handleAdventureSettings(packet) {
         //TODO
     }
 
-    handleLevelSoundEvent(packet){
+    handleLevelSoundEvent(packet) {
         //this.server.getDefaultLevel().addChunkPacket  //TODO: send packet to all players in chunk radius
         this.dataPacket(packet);
         return true
     }
 
-    handleMovePlayer(packet){
+    handleMovePlayer(packet) {
 
         let newPos = packet.position.subtract(0, this._baseOffset, 0);
-        
+
         /*if (newPos.distanceSquared(this) > 1) {
             this.sendPosition(this, null, null, MovePlayerPacket.MODE_RESET);
         }*/ //TODO
@@ -853,7 +906,7 @@ class Player extends multiple(Human, CommandSender) {
         packet.yaw = Math.fmod(packet.yaw, 360);
         packet.pitch = Math.fmod(packet.pitch, 360);
 
-        if (packet.yaw < 0){
+        if (packet.yaw < 0) {
             packet.yaw += 360;
         }
 
@@ -862,8 +915,8 @@ class Player extends multiple(Human, CommandSender) {
         return true;
     }
 
-    handleAnimate(packet){
-        if (this.spawned === false){
+    handleAnimate(packet) {
+        if (this.spawned === false) {
             return true;
         }
 
@@ -874,21 +927,21 @@ class Player extends multiple(Human, CommandSender) {
         // }
 
         let pk = new AnimatePacket();
-        pk.entityRuntimeId = this.getId();
+        pk.entityRuntimeId = this.id;
         pk.action = 1; //TODO
         // pk.action = ev.getAnimationType();
         //TODO: edit method of all players and get just this.getViewers();
         this.server.broadcastPackets(this.server.getOnlinePlayers(), pk);
     }
 
-    handleResourcePackClientResponse(packet){
+    handleResourcePackClientResponse(packet) {
 
         // console.log("Got a new resource pack response with status: " + packet.status);
 
         let pk, manager;
         // console.log("Status:", ResourcePackClientResponsePacket.STATUS(packet.status));
 
-        switch(packet.status){
+        switch (packet.status) {
             case ResourcePackClientResponsePacket.STATUS_REFUSED:
                 this.player.close("", "You must accept resource packs to join this server.", true);
                 break;
@@ -899,13 +952,13 @@ class Player extends multiple(Human, CommandSender) {
                 packet.packIds.forEach(uuid => {
                     //dirty hack for mojang's dirty hack for versions
                     let slitPos = uuid.indexOf("_");
-                    if (slitPos !== false){
+                    if (slitPos !== false) {
                         uuid = uuid.slice(uuid, 0, slitPos);
                     }
 
                     let pack = manager.getPackById(uuid);
 
-                    if (!(pack instanceof ResourcePack)){
+                    if (!(pack instanceof ResourcePack)) {
                         this.player.close("", "Resource Pack is not on this server", true);
                         console.log("Got a resource pack request for unknown pack with UUID " + uuid + ", available packs: " + manager.getPackIdList().join(", "));
                         return false;
@@ -924,9 +977,11 @@ class Player extends multiple(Human, CommandSender) {
 
             case ResourcePackClientResponsePacket.STATUS_HAVE_ALL_PACKS:
                 pk = new ResourcePackStackPacket();
-                manager = this.server.getResourcePackManager();
-                pk.resourcePackStack = manager.getResourcePacks();
-                pk.mustAccept = manager.resourcePacksRequired();
+                pk.resourcePackStack = [];
+                pk.mustAccept = false;
+                // manager = this.server.getResourcePackManager();
+                // pk.resourcePackStack = manager.getResourcePacks();
+                // pk.mustAccept = manager.resourcePacksRequired();
                 this.dataPacket(pk);
                 break;
 
@@ -940,7 +995,7 @@ class Player extends multiple(Human, CommandSender) {
         return true;
     }
 
-    handleEntityEvent(packet){
+    handleEntityEvent(packet) {
         if (!this.spawned) { //|| !this.isAlive()
             return true;
         }
@@ -949,7 +1004,7 @@ class Player extends multiple(Human, CommandSender) {
 
         switch (packet.event) {
             case ActorEventPacket.EATING_ITEM:
-                if (packet.data === 0){
+                if (packet.data === 0) {
                     return false;
                 }
 
@@ -964,7 +1019,7 @@ class Player extends multiple(Human, CommandSender) {
     }
 
     //call every tick
-    processMovement(){
+    processMovement() {
         let newPos = this.newPosition;
         //let distanceSquared = newPos.distanceSquared(this);
 
@@ -977,14 +1032,16 @@ class Player extends multiple(Human, CommandSender) {
         // this.setPosition(newPos);
     }
 
-    onUpdate(currentTick){
-        if (!this.loggedIn){
+    //Bypass Attribute class problems
+
+    onUpdate(currentTick) {
+        if (!this.loggedIn) {
             return false;
         }
 
         let tickDiff = currentTick - this.lastUpdate;
 
-        if (tickDiff <= 0){
+        if (tickDiff <= 0) {
             return true;
         }
 
@@ -992,14 +1049,13 @@ class Player extends multiple(Human, CommandSender) {
 
         this.lastUpdate = currentTick;
 
-        this.sendAttributes();
+        // this.sendAttributes();
         this.processMovement();
         //this.processChunkRrquest();
     }
 
-    //Bypass Attribute class problems
     //TODO: find another way. this is just a workaround!
-    sendAttributes(sendAll = false){
+    sendAttributes(sendAll = false) {
         // let entries = sendAll ? this.attributeMap.getAll() : this.attributeMap.needSend();
         //TODO: test.
         let pk = new UpdateAttributesPacket();
@@ -1044,53 +1100,53 @@ class Player extends multiple(Human, CommandSender) {
         // });
     }
 
-    sendPosition(pos, yaw = null, pitch = null, mode = MovePlayerPacket.MODE_NORMAL, targets = null){
-      // let playerYaw = (yaw ?? this._yaw);
-       let playerYaw = this._yaw;
-      // let playerPitch = (pitch ?? this._pitch);
-      let playerPitch = this._pitch;
+    sendPosition(pos, yaw = null, pitch = null, mode = MovePlayerPacket.MODE_NORMAL, targets = null) {
+        // let playerYaw = (yaw ?? this._yaw);
+        let playerYaw = this._yaw;
+        // let playerPitch = (pitch ?? this._pitch);
+        let playerPitch = this._pitch;
 
-       let fixedpos = pos + 0.001;
+        let fixedpos = pos + 0.001;
 
-       let pk = new MovePlayerPacket();
-       pk.entityRuntimeId = this.getId();
-       pk.position = fixedpos;
-       pk.pitch = playerPitch;
-       pk.yaw = playerYaw;
-       pk.headYaw = playerYaw;
-       pk.mode = mode;
+        let pk = new MovePlayerPacket();
+        pk.entityRuntimeId = this.getId();
+        pk.position = fixedpos;
+        pk.pitch = playerPitch;
+        pk.yaw = playerYaw;
+        pk.headYaw = playerYaw;
+        pk.mode = mode;
 
-       if (targets !== null){
-           this.server.broadcastPackets(pk, targets);
-       }else{
-           this.dataPacket(pk);
-       }
+        if (targets !== null) {
+            this.server.broadcastPackets(pk, targets);
+        } else {
+            this.dataPacket(pk);
+        }
 
-       this.newPosition = null;
+        this.newPosition = null;
     }
 
-    getId(){
+    getId() {
         return this._randomClientId;
     }
 
-    handleSetDefaultGameType(packet){
+    handleSetDefaultGameType(packet) {
         return false;
     }
 
-    handleSetPlayerGameType(packet){
+    handleSetPlayerGameType(packet) {
         if (packet.gamemode !== this.gamemode) {
             this.sendGameMode();
             this.sendSettings();
         }
     }
 
-    sendGameMode(){
+    sendGameMode() {
         let pk = new SetPlayerGameTypePacket();
         pk.gamemode = Player.getClientFriendlyGamemode(this.gamemode);
         this.dataPacket(pk);
     }
 
-    sendSettings(){
+    sendSettings() {
         let pk = new AdventureSettingsPacket();
 
         pk.setFlag(AdventureSettingsPacket.WORLD_IMMUTABLE, this.isSpectator());
@@ -1102,58 +1158,48 @@ class Player extends multiple(Human, CommandSender) {
 
         //TODO Op system.
         pk.commandPermission = AdventureSettingsPacket.PERMISSION_NORMAL;
-        pk.playerPermission = 1; //TODO: PlayerPermission
-        pk.entityUniqueId = this.getId();
+        pk.playerPermission = 0; //TODO: PlayerPermission
+        pk.entityUniqueId = this.id;
 
         this.dataPacket(pk);
     }
 
-    _sendAllInventories(){
+    _sendAllInventories() {
         this._windowIndex.forEach(id => {
-            for (let inventory in id){
-                if (id.hasOwnProperty(inventory)){
+            for (let inventory in id) {
+                if (id.hasOwnProperty(inventory)) {
                     inventory.sendContents(this);
                 }
             }
         });
     }
 
-
     /**
      * @return {boolean}
      */
-    isSpectator(){
+    isSpectator() {
         return this._gamemode === Player.SPECTATOR;
     }
 
-    static getClientFriendlyGamemode(gamemode){
-        gamemode &= 0x03;
-        if (gamemode === Player.SPECTATOR) {
-            return Player.CREATIVE;
-        }
-
-        return gamemode;
-    }
-
-    handlePlayerAction(packet){
-        if (packet.action === PlayerActionPacket.ACTION_RESPAWN && packet.action === PlayerActionPacket.ACTION_DIMENSION_CHANGE_REQUEST){
+    handlePlayerAction(packet) {
+        if (packet.action === PlayerActionPacket.ACTION_RESPAWN && packet.action === PlayerActionPacket.ACTION_DIMENSION_CHANGE_REQUEST) {
             return true;
         }
 
         packet.entityRuntimeId = this.id; //IDK
         let pos = new Vector3(packet.x, packet.y, packet.z);
 
-        switch(packet.action){
+        switch (packet.action) {
             case PlayerActionPacket.ACTION_START_BREAK:
                 if (pos.distanceSquared(this) > 10000) {
                     break;
                 }
 
-                //TODO
-                // let target = this.server.getDefaultLevel().getBlock(pos);
+            //TODO
+            // let target = this.server.getDefaultLevel().getBlock(pos);
 
-                // let ev = new PlayerInteractEvent(this, null, target, packet.face, PlayerInteractEvent.LEFT_CLICK_BLOCK);
-                // this.server.getPluginManager().callEvent(ev);
+            // let ev = new PlayerInteractEvent(this, null, target, packet.face, PlayerInteractEvent.LEFT_CLICK_BLOCK);
+            // this.server.getPluginManager().callEvent(ev);
 
             case PlayerActionPacket.ACTION_ABORT_BREAK:
             case PlayerActionPacket.ACTION_STOP_BREAK:
@@ -1212,13 +1258,13 @@ class Player extends multiple(Human, CommandSender) {
         super.jump();
     }
 
-    handleInteract(packet){
+    handleInteract(packet) {
 
         if (!this.spawned || !this.isAlive()) {
 
         }
 
-        if (packet.action === InteractPacket.ACTION_MOUSEOVER && packet.target === 0){
+        if (packet.action === InteractPacket.ACTION_MOUSEOVER && packet.target === 0) {
             return true;
         }
 
@@ -1235,12 +1281,12 @@ class Player extends multiple(Human, CommandSender) {
         }
     }
 
-    getWindow(windowId){
+    getWindow(windowId) {
         return this._windowIndex[windowId] || null;
     }
 
-    handleMobEquipment(packet){
-        if (!this.spawned){
+    handleMobEquipment(packet) {
+        if (!this.spawned) {
             return true;
         }
 
@@ -1264,14 +1310,14 @@ class Player extends multiple(Human, CommandSender) {
         this.dataPacket(pk);
     }
 
-    sendMessage(message){
+    sendMessage(message) {
         let pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = message;
         this.dataPacket(pk);
     }
 
-    sendChunk(chunk){
+    sendChunk(chunk) {
         let pk = new LevelChunkPacket();
         pk.chunkX = chunk.getX();
         pk.chunkZ = chunk.getZ();
@@ -1279,17 +1325,19 @@ class Player extends multiple(Human, CommandSender) {
         pk.cacheEnabled = false;
         pk.extraPayload = chunk.toBinary();
         this.dataPacket(pk);
-        
-        if (this.spawned === false){
+
+        if (this.spawned === false) {
+            // this.player.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
+            // this.spawned = true;
             this.doFirstSpawn();
             console.log("Chunk");
         }
     }
-    
+
     /**
      * @return {PlayerSessionAdapter}
      */
-    getSessionAdapter(){
+    getSessionAdapter() {
         return this._sessionAdapter;
     }
 }

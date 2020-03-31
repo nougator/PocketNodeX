@@ -15,16 +15,7 @@ const BaseInventory = require("./BaseInventory");
 const Living = require("../entity/Living");
 const Item = require("../item/Item");
 
-class ArmorInventory extends BaseInventory{
-    static get SLOT_HEAD() {return 0};
-    static get SLOT_CHEST() {return 1};
-    static get SLOT_LEGS() {return 2};
-    static get SLOT_FEET() {return 3};
-
-    initVars(){
-        this._holder = null;
-    }
-
+class ArmorInventory extends BaseInventory {
     /**
      * @param holder {Living}
      */
@@ -35,17 +26,37 @@ class ArmorInventory extends BaseInventory{
         this._holder = holder;
     }
 
+    static get SLOT_HEAD() {
+        return 0
+    };
+
+    static get SLOT_CHEST() {
+        return 1
+    };
+
+    static get SLOT_LEGS() {
+        return 2
+    };
+
+    static get SLOT_FEET() {
+        return 3
+    };
+
+    initVars() {
+        this._holder = null;
+    }
+
     /**
      * @return {Living}
      */
-    getHolder(){
+    getHolder() {
         return this._holder;
     }
 
     /**
      * @return {string}
      */
-    getName(){
+    getName() {
         return "Armor";
     }
 
@@ -53,14 +64,14 @@ class ArmorInventory extends BaseInventory{
      *
      * @return {number}
      */
-    getDefaultSize(){
+    getDefaultSize() {
         return 4;
     }
 
     /**
      * @return {Item}
      */
-    getHelmet(){
+    getHelmet() {
         return this.getItem();
     }
 

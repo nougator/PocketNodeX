@@ -4,12 +4,12 @@ const ProtocolInfo = require("../Info");
 const SkinAnimation = require("../../../utils/SkinAnimation");
 const Skin = require("../../../entity/Skin");
 
-class PlayerSkinPacket extends DataPacket{
+class PlayerSkinPacket extends DataPacket {
     static getId() {
         return ProtocolInfo.PLAYER_SKIN_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.uuid = null;
         this.skin = null;
     }
@@ -17,7 +17,7 @@ class PlayerSkinPacket extends DataPacket{
     _decodePayload() {
         this.uuid = this.readUUID();
 
-        let [skinId, skinResourcePatch, skinData]  = [this.readString(), this.readString(), this.getImage()];
+        let [skinId, skinResourcePatch, skinData] = [this.readString(), this.readString(), this.getImage()];
         let animations = [];
         for (let i = 0; i < this.readLInt(); i++) {
             animations.push(new SkinAnimation(this.getImage(), this.readLInt(), this.readLFloat()));
@@ -37,9 +37,9 @@ class PlayerSkinPacket extends DataPacket{
         this.putImage(this.skin.getSkinData());
         this.writeLInt(this.skin.getAnimations().length);
         this.skin.getAnimations().forEach(animation => {
-           this.putImage(animation.getImage());
-           this.writeLInt(animation.getType());
-           this.writeLFloat(animation.getFrames());
+            this.putImage(animation.getImage());
+            this.writeLInt(animation.getType());
+            this.writeLFloat(animation.getFrames());
         });
         this.putImage(this.skin.getCapeData());
         this.writeString(this.skin.getGeometryData());

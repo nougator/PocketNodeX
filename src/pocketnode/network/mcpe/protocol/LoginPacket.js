@@ -9,11 +9,20 @@ const Utils = require("../../../utils/Utils");
 const Isset = require("../../../utils/methods/Isset");
 
 class LoginPacket extends DataPacket {
-    static getId(){
+
+    /** @type {string} */
+    username = '';
+    protocol;
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static getId() {
         return ProtocolInfo.LOGIN_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.username = "";
         this.protocol = 0;
         this.clientUUID = "";
@@ -30,27 +39,22 @@ class LoginPacket extends DataPacket {
         this.skipVerification = false;
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
-    canBeSentBeforeLogin(){
+    canBeSentBeforeLogin() {
         return true;
     }
 
-    mayHaveUnreadBytes(){
+    mayHaveUnreadBytes() {
         return this.protocol !== null && this.protocol !== ProtocolInfo.PROTOCOL;
     }
 
-    _decodePayload(){
+    _decodePayload() {
 
         this.protocol = this.readInt();
 
-        try{
+        try {
             this.decodeConnectionRequest();
-        }catch (e) {
-            
+        } catch (e) {
+
             if (this.protocol === ProtocolInfo.PROTOCOL) {
                 //throw e;
                 console.log("LoginPacket => same protocol: [CLIENT: => " + this.protocol + " / SERVER => " + ProtocolInfo.PROTOCOL + " ]");
@@ -61,7 +65,7 @@ class LoginPacket extends DataPacket {
 
     }
 
-    decodeConnectionRequest(){
+    decodeConnectionRequest() {
         let buffer = new BinaryStream(this.read(this.readUnsignedVarInt()));
         this.chainData = JSON.parse(buffer.read(buffer.readLInt()).toString());
 
@@ -69,27 +73,27 @@ class LoginPacket extends DataPacket {
         this.chainData["chain"].forEach(chain => {
             let webtoken = Utils.decodeJWT(chain);
 
-            if(Isset(webtoken["extraData"])){
+            if (Isset(webtoken["extraData"])) {
 
-                if (hasExtraData){
+                if (hasExtraData) {
                     // error to handle
                     console.log("Found 'extraData' multiple times in key chain");
                 }
 
                 hasExtraData = true;
 
-                if(Isset(webtoken["extraData"]["displayName"])){
+                if (Isset(webtoken["extraData"]["displayName"])) {
                     this.username = webtoken["extraData"]["displayName"];
                 }
-                if(Isset(webtoken["extraData"]["identity"])){
+                if (Isset(webtoken["extraData"]["identity"])) {
                     this.clientUUID = webtoken["extraData"]["identity"];
                 }
-                if(Isset(webtoken["extraData"]["XUID"])){
+                if (Isset(webtoken["extraData"]["XUID"])) {
                     this.xuid = webtoken["extraData"]["XUID"];
                 }
             }
 
-            if(Isset(webtoken["identityPublicKey"])){
+            if (Isset(webtoken["identityPublicKey"])) {
                 this.identityPublicKey = webtoken["identityPublicKey"];
             }
 
@@ -108,7 +112,7 @@ class LoginPacket extends DataPacket {
         //TODO
     }
 
-    handle(session){
+    handle(session) {
         return session.handleLogin(this);
     }
 }

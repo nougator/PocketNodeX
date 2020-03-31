@@ -5,15 +5,15 @@ const Item = require("../../../item/Item");
  */
 class InventoryAction {
 
-    initVars() {
-        this._sourceItem = null;
-        this._targetItem = null;
-    }
-
     constructor(sourceItem, targetItem) {
         this.initVars();
         this._sourceItem = sourceItem;
         this._targetItem = targetItem;
+    }
+
+    initVars() {
+        this._sourceItem = null;
+        this._targetItem = null;
     }
 
     /**
@@ -51,4 +51,5 @@ class InventoryAction {
     onExecuteFail(source) {
     }
 }
+
 module.exports = InventoryAction;

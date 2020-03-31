@@ -5,14 +5,24 @@ const Vector3 = require("../../../math/Vector3");
 
 class MoveActorAbsolutePacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static get FLAG_GROUND() {
+        return 0x01
+    };
+
+    static get FLAG_TELEPORT() {
+        return 0x02
+    };
+
     getId() {
         return ProtocolInfo.MOVE_ACTOR_ABSOLUTE_PACKET;
     }
 
-    static get FLAG_GROUND() {return 0x01};
-    static get FLAG_TELEPORT() {return 0x02};
-
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.entityRuntimeId = -1;
         /** @type {number} */
@@ -25,11 +35,6 @@ class MoveActorAbsolutePacket extends DataPacket {
         this.yRot = -1;
         /** @type {number} */
         this.zRot = -1;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -54,4 +59,5 @@ class MoveActorAbsolutePacket extends DataPacket {
         return session.handleMoveActorAbsolute(this);
     }
 }
+
 module.exports = MoveActorAbsolutePacket;

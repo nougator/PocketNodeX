@@ -3,18 +3,18 @@ const ProtocolInfo = require("../Info");
 
 class AddBehaviorTreePacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.ADD_BEHAVIOR_TREE_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {string} */
         this.behaviorTreeJson = "";
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -29,4 +29,5 @@ class AddBehaviorTreePacket extends DataPacket {
         return session.handleAddBehaviorTree(this);
     }
 }
+
 module.exports = AddBehaviorTreePacket;

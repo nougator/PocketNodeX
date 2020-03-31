@@ -3,6 +3,11 @@ const ProtocolInfo = require("../Info");
 
 class CommandRequestPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.COMMAND_REQUEST_PACKET;
     }
@@ -11,11 +16,6 @@ class CommandRequestPacket extends DataPacket {
         this.command = "";
         this.originData = null;
         this.isInternal = false;
-    }
-
-    constructor() {
-        super();
-        this.initVars();
     }
 
     _decodePayload() {

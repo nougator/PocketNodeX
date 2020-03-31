@@ -18,6 +18,9 @@
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "async": "^3.2.0",
+    "crypto-js": "^4.0.0",
+    "cryptojs": "^2.5.3",
     "locutus": "^2.0.11",
     "pocketnode-binarystream": "git+https://github.com/PocketNode/PocketNode-BinaryStream.git",
     "pocketnode-language": "git+https://github.com/PocketNode/PocketNode-Language.git",

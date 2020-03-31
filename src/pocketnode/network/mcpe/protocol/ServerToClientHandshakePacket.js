@@ -2,17 +2,17 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ServerToClientHandshakePacket extends DataPacket {
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.SERVER_TO_CLIENT_HANDSHAKE_PACKET;
     }
 
     initVars() {
         this.jwt = "";
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     canBeSentBeforeLogin() {

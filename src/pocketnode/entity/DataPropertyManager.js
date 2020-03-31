@@ -1,15 +1,15 @@
 const Isset = require("../utils/methods/Isset");
 const Entity = require("./Entity");
 
-class DataPropertyManager{
+class DataPropertyManager {
 
-    initVars(){
-        this._properties = [];
-        this._dirtyProperties = []
+    constructor() {
+        this.initVars();
     }
 
-    constructor(){
-        this.initVars();
+    initVars() {
+        this._properties = [];
+        this._dirtyProperties = []
     }
 
     /**
@@ -88,7 +88,7 @@ class DataPropertyManager{
      * @param value {number}
      * @param force {boolean}
      */
-    setFloat(key, value, force = false){
+    setFloat(key, value, force = false) {
         this.setPropertyValue(key, Entity.DATA_TYPE_FLOAT, value, force);
     }
 
@@ -97,7 +97,7 @@ class DataPropertyManager{
      *
      * @return {boolean}
      */
-    getString(key){
+    getString(key) {
         let value = this.getPropertyValue(key, Entity.DATA_TYPE_STRING);
         assert(typeof value === 'string' || value === null);
         return value;
@@ -108,7 +108,7 @@ class DataPropertyManager{
      * @param value {number}
      * @param force {boolean}
      */
-    setString(key, value, force = false){
+    setString(key, value, force = false) {
         this.setPropertyValue(key, Entity.DATA_TYPE_STRING, value, force);
     }
 
@@ -120,7 +120,7 @@ class DataPropertyManager{
     /**
      * @param key {number}
      */
-    removeProperty(key){
+    removeProperty(key) {
         let index = this._properties.indexOf(key);
         this._properties.splice(index, 1);
         // delete this._properties[key];
@@ -131,7 +131,7 @@ class DataPropertyManager{
      *
      * @return {boolean}
      */
-    hasProperty(key){
+    hasProperty(key) {
         return Isset(this._properties[key]);
     }
 
@@ -140,15 +140,15 @@ class DataPropertyManager{
      *
      * @return {number}
      */
-    getPropertyType(key){
-        if (Isset(this._properties[key])){
+    getPropertyType(key) {
+        if (Isset(this._properties[key])) {
             return this._properties[key][0];
         }
 
         return -1;
     }
 
-    _checkType(key, type){
+    _checkType(key, type) {
         if (Isset(this._properties[key]) && this._properties[key][0] !== type) {
             console.log(`Expected type ${type}, but have " . ${this._properties[key][0]}`)
         }
@@ -160,8 +160,8 @@ class DataPropertyManager{
      *
      * @return {*}
      */
-    getPropertyValue(key, type){
-        if (type !== -1){
+    getPropertyValue(key, type) {
+        if (type !== -1) {
             this._checkType(key, type);
         }
         return Isset(this._properties[key] ? this._properties[key][1] : null);
@@ -173,8 +173,8 @@ class DataPropertyManager{
      * @param value {*}
      * @param force {boolean}
      */
-    setPropertyValue(key, type, value, force = false){
-        if (!force){
+    setPropertyValue(key, type, value, force = false) {
+        if (!force) {
             this._checkType(key, type);
         }
 
@@ -186,7 +186,7 @@ class DataPropertyManager{
      *
      * @return {Array}
      */
-    getAll(){
+    getAll() {
         return this._properties;
     }
 
@@ -195,14 +195,14 @@ class DataPropertyManager{
      *
      * @return {Array}
      */
-    getDirty(){
+    getDirty() {
         return this._dirtyProperties;
     }
 
     /**
      * Clears records of dirty properties.
      */
-    cleanDirtyProperties(){
+    cleanDirtyProperties() {
         this._dirtyProperties = [];
     }
 }

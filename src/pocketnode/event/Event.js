@@ -11,41 +11,42 @@
 */
 class Event {
 
-    constructor(){
+    constructor() {
         this.eventName = null;
         this.isCancelled = false;
     }
 
     /**
-	 * @return string
-	 */
-	getEventName(){
-		return this.eventName ? null : this.constructor.name;
-	}
+     * @return string
+     */
+    getEventName() {
+        return this.eventName ? null : this.constructor.name;
+    }
 
-	/**
-	 * @return bool
-	 *
-	 * @throws Error
-	 */
-	isCancelled(){
-		//if(!(this instanceof Cancellable)){
-		//	throw new Error("Event is not Cancellable");
-		//}
-		return this.isCancelled === true;
-	}
+    /**
+     * @return bool
+     *
+     * @throws Error
+     */
+    isCancelled() {
+        //if(!(this instanceof Cancellable)){
+        //	throw new Error("Event is not Cancellable");
+        //}
+        return this.isCancelled === true;
+    }
 
-	/**
-	 *
-	 * @throws Error
-	 * @param value
-	 */
-	setCancelled(value = true){
-		//if(!(this instanceof Cancellable)){
-		//	throw new Error("Event is not Cancellable");
-		//}
-		this.isCancelled = value;
-	}
+    /**
+     *
+     * @throws Error
+     * @param value
+     */
+    setCancelled(value = true) {
+        //if(!(this instanceof Cancellable)){
+        //	throw new Error("Event is not Cancellable");
+        //}
+        this.isCancelled = value;
+    }
 
 }
+
 module.exports = Event;

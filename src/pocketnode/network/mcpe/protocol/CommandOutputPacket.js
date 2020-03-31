@@ -4,6 +4,11 @@ const CommandOutputMessage = require("./types/CommandOutputMessage");
 
 class CommandOutputPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.COMMAND_OUTPUT_PACKET;
     }
@@ -14,11 +19,6 @@ class CommandOutputPacket extends DataPacket {
         this.successCount = -1;
         this.messages = [];
         this.unknownString = "";
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -52,9 +52,9 @@ class CommandOutputPacket extends DataPacket {
 
         this.writeUnsignedVarInt(this.messages.length);
         this.messages.forEach(message => {
-           this.putCommandMessage(message);
+            this.putCommandMessage(message);
         });
-        
+
         if (this.outputType === 4) {
             this.writeString(this.unknownString);
         }
@@ -66,7 +66,7 @@ class CommandOutputPacket extends DataPacket {
 
         this.writeUnsignedVarInt(message.parameters.length);
         this.messages.parameters.forEach(parameter => {
-           this.writeString(parameter);
+            this.writeString(parameter);
         });
     }
 

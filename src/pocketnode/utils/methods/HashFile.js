@@ -7,7 +7,7 @@ const FileSystem = require("fs");
  * @param path   {string}
  * @param buffer {boolean} return buffer
  */
-function HashFile(algo, path, buffer = false){
+function HashFile(algo, path, buffer = false) {
     let hash = Crypto.createHash(algo);
     hash.update(FileSystem.readFileSync(path));
     return buffer === true ? hash.digest() : hash.digest("hex");

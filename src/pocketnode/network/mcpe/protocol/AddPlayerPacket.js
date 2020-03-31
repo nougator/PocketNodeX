@@ -3,11 +3,16 @@ const ProtocolInfo = require("../Info");
 
 class AddPlayerPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.ADD_PLAYER_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.uuid = null;
         this.username = "";
         this.entityUniqueId = null; //TODO
@@ -35,11 +40,6 @@ class AddPlayerPacket extends DataPacket {
         this.deviceId = "" //TODO: fill player's device ID (???)
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
     _decodePayload() {
         this.uuid = this.readUUID();
         this.username = this.readString();
@@ -64,7 +64,7 @@ class AddPlayerPacket extends DataPacket {
         this.long1 = this.readLLong();
 
         let linkCount = this.readUnsignedVarInt();
-        for(let i = 0; i < linkCount; ++i){
+        for (let i = 0; i < linkCount; ++i) {
             //this.links[i] = this.
             //TODO
         }
@@ -102,7 +102,7 @@ class AddPlayerPacket extends DataPacket {
         this.writeString(this.deviceId);
     }
 
-    handle(session){
+    handle(session) {
         return session.handleAddPlayer(this);
     }
 }

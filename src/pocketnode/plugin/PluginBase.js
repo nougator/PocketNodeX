@@ -5,7 +5,12 @@ const PluginLogger = require("./PluginLogger");
 const Config = require("../utils/Config");
 
 class PluginBase extends Plugin {
-    initVars(){
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    initVars() {
         this.loader = {};
         this.server = {};
 
@@ -22,13 +27,8 @@ class PluginBase extends Plugin {
         this.logger = {};
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
-    init(loader, server, manifest, dataFolder, file){
-        if(this.initialized === false){
+    init(loader, server, manifest, dataFolder, file) {
+        if (this.initialized === false) {
             this.initialized = true;
             this.loader = loader;
             this.server = server;
@@ -40,28 +40,33 @@ class PluginBase extends Plugin {
         }
     }
 
-    onLoad(){}
-    onEnable(){}
-    onDisable(){}
+    onLoad() {
+    }
+
+    onEnable() {
+    }
+
+    onDisable() {
+    }
 
     /**
      * @return Boolean
      */
-    isEnabled(){
+    isEnabled() {
         return this.enabled === true;
     }
 
     /**
      * @param tf Boolean
      */
-    setEnabled(tf){
+    setEnabled(tf) {
         tf = tf || true;
         tf = tf === true;
-        if(this.enabled !== tf){
+        if (this.enabled !== tf) {
             this.enabled = tf;
-            if(this.enabled === true){
+            if (this.enabled === true) {
                 this.onEnable();
-            }else{
+            } else {
                 this.onDisable();
             }
         }
@@ -70,55 +75,55 @@ class PluginBase extends Plugin {
     /**
      * @return Boolean
      */
-    isDisabled(){
+    isDisabled() {
         return this.enabled === false;
     }
 
-    getDataFolder(){
+    getDataFolder() {
         return this.dataFolder;
     }
 
 
-    getManifset(){
+    getManifset() {
         return this.manifest;
     }
 
-    getLogger(){
+    getLogger() {
         return this.logger;
     }
 
-    isInitialized(){
+    isInitialized() {
         return this.initialized === true;
     }
 
-    resourceExists(name){
+    resourceExists(name) {
         name = name.replace("\\", "/").trim();
         let path = this.file + "resources/" + name;
 
         return FileSystem.existsSync(path);
     }
 
-    getResource(name){
+    getResource(name) {
         name = name.replace("\\", "/").trim();
         let path = this.file + "resources/" + name;
 
-        if(this.resourceExists(name)){
+        if (this.resourceExists(name)) {
             return FileSystem.readFileSync(path, {encoding: "utf-8"});
         }
 
         return null;
     }
 
-    saveResource(name, replace){
+    saveResource(name, replace) {
         replace = replace || false;
 
-        if(name.trim() === "") return false;
-        if(!this.resourceExists(name)) return false;
+        if (name.trim() === "") return false;
+        if (!this.resourceExists(name)) return false;
 
         let output = this.dataFolder + name;
-        if(!FileSystem.existsSync(this.dataFolder)) FileSystem.mkdirSync(this.dataFolder);
+        if (!FileSystem.existsSync(this.dataFolder)) FileSystem.mkdirSync(this.dataFolder);
 
-        if(FileSystem.existsSync(output) && replace !== true){
+        if (FileSystem.existsSync(output) && replace !== true) {
             return false;
         }
 
@@ -127,50 +132,50 @@ class PluginBase extends Plugin {
         return true;
     }
 
-    getConfig(){
-        if(this.config === null){
+    getConfig() {
+        if (this.config === null) {
             this.reloadConfig();
         }
 
         return this.config;
     }
 
-    saveConfig(){
+    saveConfig() {
         this.getConfig().save();
     }
 
-    saveDefaultConfig(){
-        if(!FileSystem.existsSync(this.configFile)){
+    saveDefaultConfig() {
+        if (!FileSystem.existsSync(this.configFile)) {
             return this.saveResource("config.json");
         }
 
         return false;
     }
 
-    reloadConfig(){
+    reloadConfig() {
         this.config = new Config(this.configFile, Config.JSON);
-        if(this.resourceExists("config.json")){
+        if (this.resourceExists("config.json")) {
             this.getConfig().setDefaults(JSON.parse(this.getResource("config.json")));
         }
     }
 
-    getServer(){
+    getServer() {
         return this.server;
     }
 
-    getName(){
+    getName() {
         return this.manifest.getName();
     }
 
-    getFullName(){
+    getFullName() {
         return this.manifest.getFullName();
     }
 
-    getPluginLoader(){
+    getPluginLoader() {
         return this.loader;
     }
 
-    getManifest(){
+    getManifest() {
         return this.manifest;
     }
 }

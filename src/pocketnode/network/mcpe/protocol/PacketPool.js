@@ -58,24 +58,24 @@ const LevelChunkPacket = require("./LevelChunkPacket");
 
 class PacketPool {
 
-    constructor(){
+    constructor() {
         this.packetPool = new Map();
         this.registerPackets();
     }
 
-    registerPacket(packet){
+    registerPacket(packet) {
         this.packetPool.set(packet.getId(), packet);
     }
 
-    getPacket(id){
+    getPacket(id) {
         return this.packetPool.has(id) ? new (this.packetPool.get(id))() : null;
     }
 
-    isRegistered(id){
+    isRegistered(id) {
         return this.packetPool.has(id);
     }
 
-    registerPackets(){
+    registerPackets() {
         this.registerPacket(LoginPacket);
         this.registerPacket(PlayStatusPacket);
         this.registerPacket(ServerToClientHandshakePacket);
@@ -115,7 +115,6 @@ class PacketPool {
         this.registerPacket(ActorFallPacket);
         this.registerPacket(PlayerInputPacket);
         this.registerPacket(LevelChunkPacket);
-
 
 
         this.registerPacket(UpdateSoftEnumPacket);

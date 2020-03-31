@@ -15,20 +15,20 @@ const Chunk = require("../format/Chunk");
 class Generator {
 
     /**
-     * Generator Name
-     * @return {string}
-     */
-    getName(){
-        return "unknown";
-    }
-
-    /**
      * Generator Options
      * @constructor
      * @param options
      */
-    constructor(options = {}){
+    constructor(options = {}) {
         this._options = options;
+    }
+
+    /**
+     * Generator Name
+     * @return {string}
+     */
+    getName() {
+        return "unknown";
     }
 
     /**
@@ -39,7 +39,8 @@ class Generator {
      *
      * @return {Boolean|Chunk}
      */
-    generateChunk(chunkX, chunkZ, level = null){}
+    generateChunk(chunkX, chunkZ, level = null) {
+    }
 }
 
 module.exports = Generator;

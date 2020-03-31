@@ -3,39 +3,39 @@ const ProtocolInfo = require("../Info");
 
 class DisconnectPacket extends DataPacket {
 
-    static getId(){
-        return ProtocolInfo.DISCONNECT_PACKET;
-    }
-
-    initVars(){
-        this.hideDisconnectionScreen = false;
-        this.message = "";
-    }
-
-    constructor(){
+    constructor() {
         super();
         this.initVars();
     }
 
-    canBeSentBeforeLogin(){
+    static getId() {
+        return ProtocolInfo.DISCONNECT_PACKET;
+    }
+
+    initVars() {
+        this.hideDisconnectionScreen = false;
+        this.message = "";
+    }
+
+    canBeSentBeforeLogin() {
         return true;
     }
 
-    _decodePayload(){
+    _decodePayload() {
         this.hideDisconnectionScreen = this.readBool();
-        if (!this.hideDisconnectionScreen){
+        if (!this.hideDisconnectionScreen) {
             this.message = this.readString();
         }
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeBool(this.hideDisconnectionScreen);
-        if(!this.hideDisconnectionScreen){
+        if (!this.hideDisconnectionScreen) {
             this.writeString(this.message);
         }
     }
 
-    handle(session){
+    handle(session) {
         return session.handleDisconnect(this);
     }
 }

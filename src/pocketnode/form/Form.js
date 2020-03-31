@@ -4,5 +4,6 @@
  */
 class Form {
 
-    handleResponse(player, data){};
+    handleResponse(player, data) {
+    };
 }

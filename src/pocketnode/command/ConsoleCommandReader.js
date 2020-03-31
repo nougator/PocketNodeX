@@ -2,7 +2,7 @@ const readline = require('readline');
 const ConsoleCommandSender = require("./ConsoleCommandSender");
 
 class ConsoleCommandReader {
-    constructor(Server){
+    constructor(Server) {
         let CommandSender = new ConsoleCommandSender(Server);
         let rl = readline.createInterface({
             input: process.stdin

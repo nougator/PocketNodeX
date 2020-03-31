@@ -3,16 +3,28 @@ const ProtocolInfo = require("../Info");
 
 class AnimatePacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static get ACTION_SWING_ARM() {
+        return 1
+    };
+
+    static get ACTION_STOP_SLEEP() {
+        return 3
+    };
+
+    static get ACTION_CRITICAL_HIT() {
+        return 4
+    };
+
     getId() {
         return ProtocolInfo.ANIMATE_PACKET;
     }
 
-    static get ACTION_SWING_ARM() {return 1};
-
-    static get ACTION_STOP_SLEEP() {return 3};
-    static get ACTION_CRITICAL_HIT() {return 4};
-
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.action = -1;
         /** @type {number} */
@@ -21,15 +33,10 @@ class AnimatePacket extends DataPacket {
         this.float = 0.0; //TODO (Boat rowing time?)
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
     _decodePayload() {
         this.action = this.readVarInt();
         this.entityRuntimeId = this.getEntityRuntimeId();
-        if (this.action & 0x80){
+        if (this.action & 0x80) {
             this.float = this.readLFloat();
         }
     }
@@ -37,13 +44,14 @@ class AnimatePacket extends DataPacket {
     _encodePayload() {
         this.writeVarInt(this.action);
         this.writeEntityRuntimeId(this.entityRuntimeId);
-        if (this.action & 0x80){
+        if (this.action & 0x80) {
             this.writeLFloat(this.float);
         }
     }
 
-    handle(session){
+    handle(session) {
         return session.handleAnimate(this);
     }
 }
+
 module.exports = AnimatePacket;

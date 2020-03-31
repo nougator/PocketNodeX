@@ -9,13 +9,18 @@ const TextPacket = require("./mcpe/protocol/TextPacket");
 
 const ResourcePack = require("../resourcepacks/ResourcePack");
 
+
 const Async = require("../utils/Async");
+// const aasync = require('async'); TODO
 
 const PlayStatusPacket = require("./mcpe/protocol/PlayStatusPacket");
 
-class PlayerNetworkSessionAdapter{
+class PlayerNetworkSessionAdapter {
 
-    constructor(player){
+    /** @type {boolean} */
+    _hasChunks = false;
+
+    constructor(player) {
         /** @type {Server} */
         this.server = player.server;
         /** @type {RakNetAdapter} */
@@ -24,22 +29,22 @@ class PlayerNetworkSessionAdapter{
         this.player = player;
     }
 
-    sendPacket(packet, needACK = false, immediate = true){
-        return this.raknetAdapter.sendPacket(this.player, packet, needACK, immediate);
-    }
+    // sendPacket(packet, needACK = false, immediate = true) {
+    //     return this.raknetAdapter.sendPacket(this.player, packet, needACK, immediate);
+    // }
 
-    handleDataPacket(packet){
+    handleDataPacket(packet) {
         CheckTypes([DataPacket, packet]);
 
-        if (!this.player.isConnected()){
+        if (!this.player.isConnected()) {
             return;
         }
 
         packet.decode();
 
-        if(!packet.feof() && !packet.mayHaveUnreadBytes()){
+        if (!packet.feof() && !packet.mayHaveUnreadBytes()) {
             let remains = packet.buffer.slice(packet.offset);
-            this.server.getLogger().debug("Still "+ remains.length + " bytes unread in " + packet.getName() + ": 0x" + remains.toString("hex"));
+            this.server.getLogger().debug("Still " + remains.length + " bytes unread in " + packet.getName() + ": 0x" + remains.toString("hex"));
         }
 
         //console.log("Got "+packet.getName()+" from "+this);
@@ -53,13 +58,13 @@ class PlayerNetworkSessionAdapter{
         // }
     }
 
-    handleLogin(packet){
+    handleLogin(packet) {
         //CheckTypes([LoginPacket, packet]);
 
         return this.player.handleLogin(packet);
     }
 
-    handleClientToServerHandshake(packet){
+    handleClientToServerHandshake(packet) {
         //CheckTypes([])
         return false;
     }
@@ -72,29 +77,30 @@ class PlayerNetworkSessionAdapter{
 
     //handleLevelSoundEventPacket
 
-    handleActorEvent(packet){
+    handleActorEvent(packet) {
         return this.player.handleEntityEvent(packet);
     }
 
-    handleActorFall(packet){
+    handleActorFall(packet) {
         //CheckTypes([ActorFallPacket, packet]);
         return true; // Not used
     }
 
-    handleLevelEvent(packet){
+    handleLevelEvent(packet) {
         return false;
     }
 
-    handlePlayerInput(packet){
+    handlePlayerInput(packet) {
         return false; //TODO
     }
 
-    handleActorPickRequest(packet){
+    handleActorPickRequest(packet) {
         //CheckTypes([ActorPickRequestPacket, packet]);
         return false; // TODO
     }
 
-    handleSetLocalPlayerAsInitialized(packet){
+    handleSetLocalPlayerAsInitialized(packet) {
+        console.log('init');
         this.player.doFirstSpawn();
         return true;
     }
@@ -103,20 +109,20 @@ class PlayerNetworkSessionAdapter{
         //TODO
     }
 
-    handlePlayerSkin(packet){
+    handlePlayerSkin(packet) {
         return this.player.changeSkin(packet.skin, packet.newSkinName, packet.oldSkinName);
     }
 
-    handleResourcePackClientResponse(packet){
+    handleResourcePackClientResponse(packet) {
         this.player.handleResourcePackClientResponse(packet);
     }
 
-    handleResourcePackChunkRequest(packet){
+    handleResourcePackChunkRequest(packet) {
         let manager = this.server.getResourcePackManager();
         let pack = manager.getPackById(packet.packId);
         //let pack = manager.getPackById(uuid.substr(0), (uuid + "").indexOf("_"));
 
-        if(!(pack instanceof ResourcePack)){
+        if (!(pack instanceof ResourcePack)) {
             this.player.close("", "Resource pack was not found on this server!", true);
             this.server.getLogger().debug("Got a resource pack chunk request for unknown pack with UUID " + packet.packId + ", available packs: " + manager.getPackIdList().join(", "));
 
@@ -132,13 +138,14 @@ class PlayerNetworkSessionAdapter{
         return true;
     }
 
-    handleRequestChunkRadius(packet){
+    handleRequestChunkRadius(packet) {
 
         console.log("new chunk radius request");
 
         this.player.setViewDistance(packet.radius);
 
-        Async(function() {
+        Async(function () {
+            if (this._hasChunks) return;
             let distance = this.player.getViewDistance();
             for (let chunkX = -distance; chunkX <= distance; chunkX++) {
                 for (let chunkZ = -distance; chunkZ <= distance; chunkZ++) {
@@ -160,139 +167,140 @@ class PlayerNetworkSessionAdapter{
 
                     chunk.recalculateHeightMap();
 
+                    this._hasChunks = true;
                     this.player.sendChunk(chunk);
                 }
             }
         }.bind(this))
-            .then(function(){
+            .then(function () {
                 console.log("done sending chunks");
-                //TODO
+                // TODO
                 this.player.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
             }.bind(this));
         return true;
     }
 
-    handleLevelSoundEvent(packet){
+    handleLevelSoundEvent(packet) {
         return this.player.handleLevelSoundEvent(packet);
     }
 
-    handleSetTime(packet){
+    handleSetTime(packet) {
         return false;
     }
 
-    handleAddPlayer(packet){
+    handleAddPlayer(packet) {
         return false;
     }
 
-    handleMovePlayer(packet){
+    handleMovePlayer(packet) {
         return this.player.handleMovePlayer(packet);
     }
 
-    handlePlayerAction(packet){
+    handlePlayerAction(packet) {
         return this.player.handlePlayerAction(packet);
     }
 
-    handleSubClientLogin(packet){
+    handleSubClientLogin(packet) {
         return false;
     }
 
-    handleStructureBlockUpdate(){
+    handleStructureBlockUpdate() {
         return false;
     }
 
-    handleUpdateBlock(packet){
+    handleUpdateBlock(packet) {
         return false;
     }
 
-    handleRiderJump(packet){
+    handleRiderJump(packet) {
         return false;
     }
 
-    handleMoveActorAbsolute(packet){
+    handleMoveActorAbsolute(packet) {
         return false;
     }
 
-    handleBlockEvent(packet){
+    handleBlockEvent(packet) {
         return false;
     }
 
-    handleDisconnect(packet){
+    handleDisconnect(packet) {
         return false;
     }
 
-    handleRemoveActor(packet){
+    handleRemoveActor(packet) {
         return false;
     }
 
-    handleExplode(packet){
+    handleExplode(packet) {
         return false;
     }
 
-    handleLevelSoundEventPacketV1(packet){
+    handleLevelSoundEventPacketV1(packet) {
         return false;
     }
 
-    handleServerToClientHandshake(packet){
+    handleServerToClientHandshake(packet) {
         return false;
     }
 
-    handleTakeItemActor(packet){
+    handleTakeItemActor(packet) {
         return false;
     }
 
-    handleAnimate(packet){
+    handleAnimate(packet) {
         return this.player.handleAnimate(packet);
     }
 
-    handleSetEntityData(packet){
+    handleSetEntityData(packet) {
         return false;
     }
 
-    handleUpdateAttributes(packet){
+    handleUpdateAttributes(packet) {
         return false;
     }
 
-    handleAddBehaviorTree(packet){
+    handleAddBehaviorTree(packet) {
         return false;
     }
 
-    handleAddEntity(packet){
+    handleAddEntity(packet) {
         return false;
     }
 
-    handleSetDefaultGameType(){
+    handleSetDefaultGameType() {
         return this.player.handleSetDefaultGameType(packet);
     }
 
-    handlePlayStatus(packet){
+    handlePlayStatus(packet) {
         return false;
     }
 
-    handleAddPainting(packet){
+    handleAddPainting(packet) {
         return false;
     }
 
-    handleMobEquipment(packet){
+    handleMobEquipment(packet) {
         this.player.handleMobEquipment(packet);
     }
 
-    handleAdventureSettings(packet){
+    handleAdventureSettings(packet) {
         this.player.handleAdventureSettings(packet);
     }
 
-    handleInteract(packet){
+    handleInteract(packet) {
         this.player.handleInteract(packet);
     }
 
-    handleAutomationClientConnect(packet){
+    handleAutomationClientConnect(packet) {
         return false;
     }
 
-    handleMobArmorEquipment(packet){
+    handleMobArmorEquipment(packet) {
         return true;
     }
 
-    handleAvailableCommands(packet){
+    handleAvailableCommands(packet) {
         return false;
     }
 
@@ -300,35 +308,32 @@ class PlayerNetworkSessionAdapter{
         return false;
     }
 
-    handleSetTitle(packet){
+    handleSetTitle(packet) {
         return false;
     }
 
-    handleMobEffect(packet){
+    handleMobEffect(packet) {
         return false;
     }
 
     //TODO
-    handleBlockPickRequest(packet){
+    handleBlockPickRequest(packet) {
         this.player.handleBlockPickRequest(packet);
     }
 
-    handleCommandRequest(packet){
+    handleCommandRequest(packet) {
         return this.player.chat(packet.command);
     }
 
-    handleText(packet){
-
-        console.log(packet);
-
-        if(packet.type === TextPacket.TYPE_CHAT){
+    handleText(packet) {
+        if (packet.type === TextPacket.TYPE_CHAT) {
             return this.player.chat(packet.message);
         }
 
         return false;
     }
 
-    toString(){
+    toString() {
         return this.player.getName() !== "" ? this.player.getName() : this.player.getAddress() + ":" + this.player.getPort();
     }
 }

@@ -32,8 +32,10 @@ class InventoryEventProcessor {
      * @param oldItem
      * @param newItem
      */
-    onSlotChange(inventory, slot, oldItem, newItem){};
-        //CheckTypes([Inventory, inventory], [Item, oldItem], [Item, newItem]);
+    onSlotChange(inventory, slot, oldItem, newItem) {
+    };
+
+    //CheckTypes([Inventory, inventory], [Item, oldItem], [Item, newItem]);
 }
 
 module.exports = InventoryEventProcessor;

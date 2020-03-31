@@ -3,18 +3,18 @@ const ProtocolInfo = require("../Info");
 
 class AutomationClientConnectPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.AUTOMATION_CLIENT_CONNECT_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {string} */
         this.serverUri = "";
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -29,4 +29,5 @@ class AutomationClientConnectPacket extends DataPacket {
         return session.handleAutomationClientConnect(this);
     }
 }
+
 module.exports = AutomationClientConnectPacket;

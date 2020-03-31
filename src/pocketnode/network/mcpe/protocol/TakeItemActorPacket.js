@@ -3,20 +3,20 @@ const ProtocolInfo = require("../Info");
 
 class TakeItemActorPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.TAKE_ITEM_ACTOR_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number} */
         this.target = -1;
         /** @type {number} */
         this.eid = -1;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -33,4 +33,5 @@ class TakeItemActorPacket extends DataPacket {
         return session.handleTakeItemActor(this);
     }
 }
+
 module.exports = TakeItemActorPacket;

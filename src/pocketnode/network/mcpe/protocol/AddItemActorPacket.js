@@ -8,11 +8,16 @@ class AddItemActorPacket extends DataPacket {
 
     //TODO
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     getId() {
         return ProtocolInfo.ADD_ITEM_ACTOR_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {number|null} */
         this.entityUniqueId = null; //TODO
         /** @type {number} */
@@ -29,15 +34,11 @@ class AddItemActorPacket extends DataPacket {
         this.isFromFishing = false;
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
     _decodePayload() {
         this.entityUniqueId = this.getEntityUniqueId();
         this.entityRuntimeId = this.getEntityRuntimeId();
         // todo: this.item = this.readSlot();
     }
 }
+
 module.exports = AddItemActorPacket;

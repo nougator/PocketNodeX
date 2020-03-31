@@ -6,7 +6,7 @@ class UpdateAttributesPacket extends DataPacket {
         return ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.entityRuntimeId = -1;
         this.entries = [];
     }
@@ -18,7 +18,8 @@ class UpdateAttributesPacket extends DataPacket {
 
     _encodePayload() {
         this.writeEntityRuntimeId(this.entityRuntimeId);
-        // this.writeAttributeList(this.entries);
+        // console.log(this.entries);
+        this.writeAttributeList(this.entries);
     }
 
     handle(session) {

@@ -1,7 +1,7 @@
 const ClassHasMethod = require("../utils/methods/ClassHasMethod");
 
 class PluginLoader {
-    constructor(){
+    constructor() {
         let methods = [
             // Loads the plugin from 'file'
             // @param file String
@@ -25,7 +25,7 @@ class PluginLoader {
         ];
 
         let missingMethods;
-        if((missingMethods = ClassHasMethod(this.constructor, methods)) !== true){
+        if ((missingMethods = ClassHasMethod(this.constructor, methods)) !== true) {
             throw new Error("Plugin is missing the following method(s): " + missingMethods.join(", "));
         }
     }

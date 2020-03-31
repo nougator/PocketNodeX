@@ -7,7 +7,7 @@ class PlayerInputPacket extends DataPacket {
         return ProtocolInfo.PLAYER_INPUT_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.motionX = -1;
         this.motionY = -1;
         this.jumping = false;
@@ -32,4 +32,5 @@ class PlayerInputPacket extends DataPacket {
         return session.handlePlayerInput(this);
     }
 }
+
 module.exports = PlayerInputPacket;

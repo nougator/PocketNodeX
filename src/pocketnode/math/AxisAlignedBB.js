@@ -10,9 +10,14 @@
  *  @link https://pocketnode.me
 */
 
-class AxisAlignedBB{
+class AxisAlignedBB {
 
-    initVars(){
+    constructor(minX, minY, minZ, maxX, maxY, maxZ) {
+        this.initVars();
+        this.setBounds(minX, minY, minZ, maxX, maxY, maxZ)
+    }
+
+    initVars() {
         this.minX = 0.0;
         this.minY = 0.0;
         this.minZ = 0.0;
@@ -21,20 +26,15 @@ class AxisAlignedBB{
         this.maxZ = 0.0;
     }
 
-    constructor(minX, minY, minZ, maxX, maxY, maxZ){
-        this.initVars();
-        this.setBounds(minX, minY, minZ, maxX, maxY, maxZ)
-    }
-
-    setBounds(minX, minY, minZ, maxX, maxY, maxZ){
-        if(minX > maxX){
-            console.log("minX " + minX +" is larger than maxX " + maxX);
+    setBounds(minX, minY, minZ, maxX, maxY, maxZ) {
+        if (minX > maxX) {
+            console.log("minX " + minX + " is larger than maxX " + maxX);
         }
-        if (minY > maxY){
-            console.log("minY " + minY +" is larger than maxY " + maxY);
+        if (minY > maxY) {
+            console.log("minY " + minY + " is larger than maxY " + maxY);
         }
-        if (minZ > maxZ){
-            console.log("minZ " + minZ +" is larger than maxZ " + maxZ);
+        if (minZ > maxZ) {
+            console.log("minZ " + minZ + " is larger than maxZ " + maxZ);
         }
 
         this.minX = minX;

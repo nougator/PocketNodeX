@@ -20,7 +20,7 @@ class PlayerJoinEvent extends PlayerEvent {
      * @param player
      * @param joinMessage
      */
-    constructor(player, joinMessage){
+    constructor(player, joinMessage) {
         super();
         this.player = player;
         /** @var string|TextContainer */
@@ -30,16 +30,17 @@ class PlayerJoinEvent extends PlayerEvent {
     /**
      * @param joinMessage
      */
-    setJoinMessage(joinMessage){
+    setJoinMessage(joinMessage) {
         this.joinMessage = joinMessage;
     }
 
     /**
-	 * @return string|TextContainer
-	 */
-    getJoinMessage(){
+     * @return string|TextContainer
+     */
+    getJoinMessage() {
         return this.joinMessage;
     }
 
 }
+
 module.exports = PlayerJoinEvent;

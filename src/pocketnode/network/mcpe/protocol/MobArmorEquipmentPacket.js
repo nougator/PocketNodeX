@@ -3,11 +3,16 @@ const ProtocolInfo = require("../Info");
 
 class MobArmorEquipmentPacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.entityRuntimeId = -1;
 
         //this intentionally doesn't use an array because we don't want any implicit dependencies on internal order
@@ -16,11 +21,6 @@ class MobArmorEquipmentPacket extends DataPacket {
         this.chest = null;
         this.legs = null;
         this.feet = null;
-    }
-
-    constructor(){
-        super();
-        this.initVars();
     }
 
     _decodePayload() {
@@ -43,4 +43,5 @@ class MobArmorEquipmentPacket extends DataPacket {
         return session.handleMobArmorEquipment(this);
     }
 }
+
 module.exports = MobArmorEquipmentPacket;

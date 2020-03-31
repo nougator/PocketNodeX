@@ -1,41 +1,42 @@
 class Skin {
 
-    initVars(){
-        this._skinId = "";
-        this._skinResourcePatch = "";
-        this._skinData = "";
-        this._animations = [];
-        this._capeData = "";
-        this._geometryData = "";
-        this._animationData = "";
-        this._premium = false;
-        this._persona = false;
-        this._capeOnClassic = false;
-        this._capeId = "";
+    static ACCEPTED_SKIN_SIZES = [
+        64 * 32 * 4,
+        64 * 64 * 4,
+        128 * 128 * 4
+    ];
 
+    /** @type {string} */
+    _skinId;
+    /** @type {string} */
+    _skinData;
+    /** @type {string} */
+    _capeData;
+    /** @type {string} */
+    _geometryName;
+    /** @type {string} */
+    _geometryData;
 
-        this.ACCEPTED_SKIN_SIZES = [
-            64 * 32 * 4,
-            64 * 64 * 4,
-            128 * 128 * 4
-        ]
-    }
-
-    constructor(skinId, skinResourcePatch, skinData, animations = [], capeData, geometryName = "", geometryData = "", animationData = "", premium = false, persona = false, capeOnClassic = false, capeId = "") {
-        this.initVars();
+    /**
+     * @param skinId {string}
+     * @param skinData {string}
+     * @param capeData {string}
+     * @param geometryName {string}
+     * @param geometryData {string}
+     */
+    constructor(skinId, skinData, capeData = "", geometryName = "", geometryData = "") {
         this._skinId = skinId;
         this._skinData = skinData;
-        this._animations = animations;
         this._capeData = capeData;
+        this._geometryName = geometryName;
         this._geometryData = geometryData;
-        this._animationData = animationData;
-        this._premium = premium;
-        this._persona = persona;
-        this._capeOnClassic = capeOnClassic;
-        this._capeId = capeId;
     }
 
-    isValid(){
+    /**
+     * @deprecated
+     * @return {boolean}
+     */
+    isValid() {
         try {
             this.validate();
             return true;
@@ -44,77 +45,51 @@ class Skin {
         }
     }
 
-    static getAcceptedSkinSizes(){
-        return self.ACCEPTED_SKIN_SIZES;
-    }
-
-    //todo: broadcast errors
-    validate(){
-        if (this._skinId === ""){
-            // skin id must not be empty
+    /**
+     * @throws Error
+     */
+    validate() {
+        if (this._skinId === "") {
+            throw new Error('Skin ID must not be empty');
         }
-        //TODO
-        /*let len = this._skinData.length;
-        if (!this.ACCEPTED_SKIN_SIZES.includes(len)){
-            console.log("Invalid skin data size len bytes");
+        let len = this._skinData.length;
+        if (!Skin.ACCEPTED_SKIN_SIZES.includes(len)) {
+            throw new Error(`Invalid skin data size ${len} bytes (allowed sizes: ${Skin.ACCEPTED_SKIN_SIZES.join(', ')})`);
         }
-        if (this._capeData !== null && this._capeData.length !== 8192) {
-            console.log("Invalid cape data size");
-        }*/
+        if (this._capeData !== "" && this._capeData.length !== 8192) {
+            throw new Error(`Invalid cape data size ${this._capeData.length} bytes (must be exactly 8192 bytes)`);
+        }
         //TODO: validate geometry
     }
 
-    getSkinId(){
+    /** @return {string} */
+    getSkinId() {
         return this._skinId;
     }
 
-    getSkinData(){
+    /** @return {string} */
+    getSkinData() {
         return this._skinData;
     }
 
-    getCapeData(){
+    /** @return {string} */
+    getCapeData() {
         return this._capeData;
     }
 
-    getSkinResourcePatch() {
-        return this._skinResourcePatch;
+    /** @return {string} */
+    getGeometryName() {
+        return this._geometryName;
     }
 
-    getAnimations() {
-        return this._animations;
-    }
-
-    getAnimationData() {
-        return this._animationData;
-    }
-
-    getPremium() {
-        return this._premium;
-    }
-
-    getPersona() {
-        return this._persona;
-    }
-
-    getCapeOnClassic() {
-        return this._capeOnClassic;
-    }
-
-    getCapeId() {
-        return this._capeId;
-    }
-
-    getFullSkinId() {
-        return this._skinId + "_" + this._capeId;
-    }
-
-    getGeometryData(){
+    /** @return {string} */
+    getGeometryData() {
         return this._geometryData;
     }
 
-    debloatGeometryData(){
-        if (this._geometryData !== ""){
-            this._geometryData = JSON.parse(JSON.stringify(this._geometryData));
+    debloatGeometryData() {
+        if (this._geometryData !== "") {
+            this._geometryData = JSON.stringify(JSON.parse(this._geometryData));
         }
     }
 }

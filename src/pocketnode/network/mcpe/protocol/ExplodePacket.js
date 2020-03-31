@@ -5,11 +5,16 @@ const Vector3 = require("../../../math/Vector3");
 
 class ExplodePacket extends DataPacket {
 
+    constructor() {
+        super();
+        this.initVars();
+    }
+
     static getId() {
         return ProtocolInfo.EXPLODE_PACKET;
     }
 
-    initVars(){
+    initVars() {
         /** @type {Vector3} */
         this.position = null;
         /** @type {number} */
@@ -18,12 +23,7 @@ class ExplodePacket extends DataPacket {
         this.records = [];
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
-    clean(){
+    clean() {
         this.records = [];
         return super.reset();
     }
@@ -32,7 +32,7 @@ class ExplodePacket extends DataPacket {
         this.position = this.readVector3();
         this.radius = (this.readVarInt() / 32);
         let count = this.readUnsignedVarInt();
-        for (let i = 0; i < count; ++i){
+        for (let i = 0; i < count; ++i) {
             let x, y, z;
             x = y = z = null;
             this.readSignedBlockPosition(x, y, z);
@@ -44,9 +44,9 @@ class ExplodePacket extends DataPacket {
         this.readVector3(this.position);
         this.writeVarInt(this.radius * 32);
         this.writeUnsignedVarInt(this.records.length);
-        if (this.records.length > 0){
+        if (this.records.length > 0) {
             this.records.forEach(record => {
-               this.readSignedBlockPosition(record.x, record.y, record.z);
+                this.readSignedBlockPosition(record.x, record.y, record.z);
             });
         }
     }

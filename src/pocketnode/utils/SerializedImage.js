@@ -1,11 +1,4 @@
-
 class SerializedImage {
-
-    initVars() {
-        this._height = -1;
-        this._width = -1;
-        this._data = "";
-    }
 
     constructor(height, width, data) {
         this._height = height;
@@ -26,6 +19,12 @@ class SerializedImage {
             default:
                 console.log("Unknown SerializedImage size");
         }
+    }
+
+    initVars() {
+        this._height = -1;
+        this._width = -1;
+        this._data = "";
     }
 
     getHeight() {

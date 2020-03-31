@@ -16,13 +16,13 @@ const Chunk = require("../format/Chunk");
 
 class FlatGenerator extends Generator {
 
-    constructor(){
+    constructor() {
         super();
         this._chunk = null;
     }
 
-    generateChunk(chunkX, chunkZ){
-        if(this._chunk === null){
+    generateChunk(chunkX, chunkZ) {
+        if (this._chunk === null) {
             let chunk = new Chunk(chunkX, chunkZ);
 
             for (let x = 0; x < 16; x++) {

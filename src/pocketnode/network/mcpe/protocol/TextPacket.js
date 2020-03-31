@@ -3,22 +3,56 @@ const ProtocolInfo = require("../Info");
 
 class TextPacket extends DataPacket {
 
-    static getId(){
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static get TYPE_RAW() {
+        return 0
+    }
+
+    static get TYPE_CHAT() {
+        return 1
+    }
+
+    static get TYPE_TRANSLATION() {
+        return 2
+    }
+
+    static get TYPE_POPUP() {
+        return 3
+    }
+
+    static get TYPE_JUKEBOX_POPUP() {
+        return 4
+    }
+
+    static get TYPE_TIP() {
+        return 5
+    }
+
+    static get TYPE_SYSTEM() {
+        return 6
+    }
+
+    static get TYPE_WHISPER() {
+        return 7
+    }
+
+    static get TYPE_ANNOUNCEMENT() {
+        return 8
+    }
+
+    static get TYPE_JSON() {
+        return 9
+    }
+
+    static getId() {
         return ProtocolInfo.TEXT_PACKET;
     }
 
-    static get TYPE_RAW(){return 0}
-    static get TYPE_CHAT(){return 1}
-    static get TYPE_TRANSLATION(){return 2}
-    static get TYPE_POPUP(){return 3}
-    static get TYPE_JUKEBOX_POPUP(){return 4}
-    static get TYPE_TIP(){return 5}
-    static get TYPE_SYSTEM(){return 6}
-    static get TYPE_WHISPER(){return 7}
-    static get TYPE_ANNOUNCEMENT(){return 8}
-    static get TYPE_JSON(){return 9}
-
-    initVars(){
+    initVars() {
         this.type = -1;
         this.needsTranslation = false;
         this.sourceName = "";
@@ -28,15 +62,10 @@ class TextPacket extends DataPacket {
         this.platformChatId = "";
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
-    _decodePayload(){
+    _decodePayload() {
         this.type = this.readByte();
         this.needsTranslation = this.readBool();
-        switch(this.type){
+        switch (this.type) {
             case TextPacket.TYPE_CHAT:
             case TextPacket.TYPE_WHISPER:
             case TextPacket.TYPE_ANNOUNCEMENT:
@@ -52,7 +81,7 @@ class TextPacket extends DataPacket {
             case TextPacket.TYPE_JUKEBOX_POPUP:
                 this.message = this.readString();
                 let count = this.readUnsignedVarInt();
-                for(let i = 0; i < count; ++i){
+                for (let i = 0; i < count; ++i) {
                     this.parameters.push(this.readString());
                 }
                 break;
@@ -62,10 +91,10 @@ class TextPacket extends DataPacket {
         this.platformChatId = this.readString();
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeByte(this.type);
         this.writeBool(this.needsTranslation);
-        switch(this.type){
+        switch (this.type) {
             case TextPacket.TYPE_CHAT:
             case TextPacket.TYPE_WHISPER:
             case TextPacket.TYPE_ANNOUNCEMENT:
@@ -89,7 +118,7 @@ class TextPacket extends DataPacket {
         this.writeString(this.platformChatId);
     }
 
-    handle(session){
+    handle(session) {
         return session.handleText(this);
     }
 }

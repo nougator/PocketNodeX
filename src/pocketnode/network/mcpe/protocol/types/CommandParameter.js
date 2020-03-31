@@ -1,7 +1,7 @@
 const CommandEnum = require("./CommandEnum");
 
-class CommandParameter{
-    constructor(){
+class CommandParameter {
+    constructor() {
         /** @type {string} */
         this.paramName = "";
         /** @type {number} */
@@ -16,4 +16,5 @@ class CommandParameter{
         this.postfix = null;
     }
 }
+
 module.exports = CommandParameter;

@@ -2,27 +2,27 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePacksInfoPacket extends DataPacket {
-    static getId(){
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static getId() {
         return ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.mustAccept = false;
         this.hasScripts = false;
         this.behaviorPackEntries = [];
         this.resourcePackEntries = [];
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
-    _decodePayload(){
+    _decodePayload() {
         this.mustAccept = this.readBool();
         this.hasScripts = this.readBool();
         let behaviourPackCount = this.readLShort();
-        while(behaviourPackCount-- > 0){
+        while (behaviourPackCount-- > 0) {
             this.readString();
             this.readString();
             this.readLLong();
@@ -33,7 +33,7 @@ class ResourcePacksInfoPacket extends DataPacket {
         }
 
         let resourcePackCount = this.readLShort();
-        while(resourcePackCount-- > 0){
+        while (resourcePackCount-- > 0) {
             this.readString();
             this.readString();
             this.readLLong();
@@ -44,7 +44,7 @@ class ResourcePacksInfoPacket extends DataPacket {
         }
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeBool(this.mustAccept);
         this.writeBool(this.hasScripts);
         this.writeLShort(this.behaviorPackEntries.length);

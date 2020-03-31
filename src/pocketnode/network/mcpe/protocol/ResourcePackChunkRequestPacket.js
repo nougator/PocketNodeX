@@ -2,31 +2,31 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePackChunkRequestPacket extends DataPacket {
-    static getId(){
-        return ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET;
-    }
-
-    initVars(){
-        this.packId = "";
-        this.chunkIndex = 0;
-    }
-
-    constructor(){
+    constructor() {
         super();
         this.initVars();
     }
 
-    _decodePayload(){
+    static getId() {
+        return ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET;
+    }
+
+    initVars() {
+        this.packId = "";
+        this.chunkIndex = 0;
+    }
+
+    _decodePayload() {
         this.packId = this.readString();
         this.chunkIndex = this.readLInt();
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeString(this.packId);
         this.writeLInt(this.chunkIndex);
     }
 
-    handle(session){
+    handle(session) {
         return session.handleResourcePackChunkRequest(this);
     }
 }

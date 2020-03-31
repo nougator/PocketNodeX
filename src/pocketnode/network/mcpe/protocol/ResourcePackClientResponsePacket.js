@@ -2,16 +2,33 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePackClientResponsePacket extends DataPacket {
-    static getId(){
+    constructor() {
+        super();
+        this.initVars();
+    }
+
+    static get STATUS_REFUSED() {
+        return 1
+    }
+
+    static get STATUS_SEND_PACKS() {
+        return 2
+    }
+
+    static get STATUS_HAVE_ALL_PACKS() {
+        return 3
+    }
+
+    static get STATUS_COMPLETED() {
+        return 4
+    }
+
+    static getId() {
         return ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET;
     }
 
-    static get STATUS_REFUSED(){return 1}
-    static get STATUS_SEND_PACKS(){return 2}
-    static get STATUS_HAVE_ALL_PACKS(){return 3}
-    static get STATUS_COMPLETED(){return 4}
-    static STATUS(status){
-        switch(status){
+    static STATUS(status) {
+        switch (status) {
             case ResourcePackClientResponsePacket.STATUS_REFUSED:
                 return "REFUSED";
             case ResourcePackClientResponsePacket.STATUS_SEND_PACKS:
@@ -23,25 +40,20 @@ class ResourcePackClientResponsePacket extends DataPacket {
         }
     }
 
-    initVars(){
+    initVars() {
         this.status = 0;
         this.packIds = [];
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
-    _decodePayload(){
+    _decodePayload() {
         this.status = this.readByte();
         let entryCount = this.readLShort();
-        while(entryCount-- > 0){
+        while (entryCount-- > 0) {
             this.packIds.push(this.readString());
         }
     }
 
-    _encodePayload(){
+    _encodePayload() {
         this.writeByte(this.status);
         this.writeLShort(this.packIds.length);
         this.packIds.forEach(id => {
@@ -49,7 +61,7 @@ class ResourcePackClientResponsePacket extends DataPacket {
         });
     }
 
-    handle(session){
+    handle(session) {
         return session.handleResourcePackClientResponse(this);
     }
 }

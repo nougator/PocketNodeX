@@ -9,53 +9,95 @@ const Isset = require("../../../utils/methods/Isset");
 
 class AvailableCommandsPacket extends DataPacket {
 
-    getId() {
-        return ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
+    constructor() {
+        super();
+        this.initVars();
     }
 
     /**
      * This flag is set on all types EXCEPT the POSTFIX type. Not completely sure what this is for, but it is required
      * for the arg type to work correctly. VALID seems as good a name as any.
      */
-    static get ARG_FLAG_VALID() {return 0x100000};
+    static get ARG_FLAG_VALID() {
+        return 0x100000
+    };
 
     /**
      * Basic parameter types. These must be combined with the ARG_FLAG_VALID constant.
      * ARG_FLAG_VALID | (type const)
      */
-    static get ARG_TYPE_INT() {return 0x01};
-    static get ARG_TYPE_FLOAT() {return 0x02};
-    static get ARG_TYPE_VALUE() {return 0x03};
-    static get ARG_TYPE_WILDCARD_INT() {return 0x04};
-    static get ARG_TYPE_OPERATOR() {return 0x05};
-    static get ARG_TYPE_TARGET() {return 0x06};
+    static get ARG_TYPE_INT() {
+        return 0x01
+    };
 
-    static get ARG_TYPE_FILEPATH() {return 0x0e};
+    static get ARG_TYPE_FLOAT() {
+        return 0x02
+    };
 
-    static get ARG_TYPE_STRING() {return 0x1b};
+    static get ARG_TYPE_VALUE() {
+        return 0x03
+    };
 
-    static get ARG_TYPE_POSITION() {return 0x1d};
+    static get ARG_TYPE_WILDCARD_INT() {
+        return 0x04
+    };
 
-    static get ARG_TYPE_MESSAGE() {return 0x20};
+    static get ARG_TYPE_OPERATOR() {
+        return 0x05
+    };
 
-    static get ARG_TYPE_RAWTEXT() {return 0x22};
+    static get ARG_TYPE_TARGET() {
+        return 0x06
+    };
 
-    static get ARG_TYPE_JSON() {return 0x25};
+    static get ARG_TYPE_FILEPATH() {
+        return 0x0e
+    };
 
-    static get ARG_TYPE_COMMAND() {return 0x2c};
+    static get ARG_TYPE_STRING() {
+        return 0x1b
+    };
+
+    static get ARG_TYPE_POSITION() {
+        return 0x1d
+    };
+
+    static get ARG_TYPE_MESSAGE() {
+        return 0x20
+    };
+
+    static get ARG_TYPE_RAWTEXT() {
+        return 0x22
+    };
+
+    static get ARG_TYPE_JSON() {
+        return 0x25
+    };
+
+    static get ARG_TYPE_COMMAND() {
+        return 0x2c
+    };
 
     /**
      * Enums are a little different: they are composed as follows:
      * ARG_FLAG_ENUM | ARG_FLAG_VALID | (enum index)
      */
-    static get ARG_FLAG_ENUM() {return 0x200000};
+    static get ARG_FLAG_ENUM() {
+        return 0x200000
+    };
 
     /**
      * This is used for /xp <level: int>L. It can only be applied to integer parameters.
      */
-    static get ARG_FLAG_POSTFIX() {return 0x1000000};
+    static get ARG_FLAG_POSTFIX() {
+        return 0x1000000
+    };
 
-    initVars(){
+    getId() {
+        return ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
+    }
+
+    initVars() {
         /**
          * @type {string[]}
          * A list of every single enum value for every single command in the packet, including alias names.
@@ -91,30 +133,25 @@ class AvailableCommandsPacket extends DataPacket {
         this.softEnums = [];
     }
 
-    constructor(){
-        super();
-        this.initVars();
-    }
-
     _decodePayload() {
         this.enumValuesCount = this.readUnsignedVarInt();
-        for (let i = 0; i < this.enumValuesCount; ++i){
+        for (let i = 0; i < this.enumValuesCount; ++i) {
             this.enumValues.push(this.readString());
         }
 
-        for(let i = 0, count = this.readUnsignedVarInt(); i < count; i++){
+        for (let i = 0, count = this.readUnsignedVarInt(); i < count; i++) {
             this.postfix.push(this.readString());
         }
 
-        for(let i = 0, count = this.readUnsignedVarInt(); i < count; i++){
+        for (let i = 0, count = this.readUnsignedVarInt(); i < count; i++) {
             this.enums.push(this.getEnum());
         }
 
-        for(let i = 0, count = this.readUnsignedVarInt(); i < count; i++){
+        for (let i = 0, count = this.readUnsignedVarInt(); i < count; i++) {
             this.commandData.push(this.getCommandData());
         }
 
-        for(let i = 0, count = this.readUnsignedVarInt(); i < count; i++){
+        for (let i = 0, count = this.readUnsignedVarInt(); i < count; i++) {
             this.softEnums.push(this.getSoftEnum());
         }
     }
@@ -122,30 +159,30 @@ class AvailableCommandsPacket extends DataPacket {
     /**
      * @return {CommandEnum}
      */
-    getEnum(){
+    getEnum() {
         let retval = new CommandEnum();
         retval.enumName = this.readString();
 
-        for (let i = 0, count = this.readUnsignedVarInt(); i < count; ++i){
+        for (let i = 0, count = this.readUnsignedVarInt(); i < count; ++i) {
             let index = this.getEnumValueIndex();
-            if (!Isset(this.enumValues[index])){
+            if (!Isset(this.enumValues[index])) {
                 console.log(`Invalid enum value index ${index}`);
             }
             //Get the enum value from the initial pile of mess
             retval.enumValues.push(this.enumValues[index]);
         }
-        return  retval;
+        return retval;
     }
 
     /**
      *
      * @return {CommandEnum}
      */
-    getSoftEnum(){
+    getSoftEnum() {
         let retval = new CommandEnum();
         retval.enumName = this.readString();
-        
-        for (let i = 0, count = this.readUnsignedVarInt(); i < count; ++i){
+
+        for (let i = 0, count = this.readUnsignedVarInt(); i < count; ++i) {
             //Get the enum value from the initial pile of mess
             retval.enumValues.push(this.readString());
         }
@@ -153,21 +190,21 @@ class AvailableCommandsPacket extends DataPacket {
         return retval;
     }
 
-    putEnum(enumVal){
+    putEnum(enumVal) {
         CheckTypes([CommandEnum, enumVal]);
         this.writeString(enumVal.enumName);
 
         this.writeUnsignedVarInt(enumVal.enumValues.length);
         enumVal.enumValues.forEach(value => {
             let index = this.enumValues.indexOf(value);
-            if(index === -1){
+            if (index === -1) {
                 throw new RangeError(`Enum value '${value}' not found`);
             }
             this.putEnumValueIndex(index);
         });
     }
 
-    putSoftEnum(enumVal){
+    putSoftEnum(enumVal) {
         this.writeString(enumVal.enumName);
 
         this.writeUnsignedVarInt(enumVal.enumValues.length);
@@ -176,27 +213,27 @@ class AvailableCommandsPacket extends DataPacket {
         });
     }
 
-    getEnumValueIndex(){
-        if(this.enumValues.length < 256){
+    getEnumValueIndex() {
+        if (this.enumValues.length < 256) {
             return this.readByte();
-        }else if (this.enumValues.length < 65536){
+        } else if (this.enumValues.length < 65536) {
             return this.readLShort();
-        }else {
+        } else {
             return this.readLInt();
         }
     }
 
-    putEnumValueIndex(index){
-        if(this.enumValues.length < 256){
+    putEnumValueIndex(index) {
+        if (this.enumValues.length < 256) {
             return this.writeByte(index);
-        }else if (this.enumValues.length < 65536){
+        } else if (this.enumValues.length < 65536) {
             return this.writeLShort(index);
-        }else {
+        } else {
             return this.writeLInt(index);
         }
     }
 
-    getCommandData(){
+    getCommandData() {
         let retval = new CommandData();
         retval.name = this.readString();
         retval.description = this.readString();
@@ -204,28 +241,28 @@ class AvailableCommandsPacket extends DataPacket {
         retval.permission = this.readByte();
         retval.aliases = this.enums[this.readLInt()] || null;
 
-        for(let overloadIndex = 0, overloadCount = this.readUnsignedVarInt(); overloadIndex < overloadCount; ++overloadIndex){
+        for (let overloadIndex = 0, overloadCount = this.readUnsignedVarInt(); overloadIndex < overloadCount; ++overloadIndex) {
             retval.overloads[overloadIndex] = [];
-            for(let paramIndex = 0, paramCount = this.readUnsignedVarInt(); paramIndex < paramCount; ++paramIndex){
+            for (let paramIndex = 0, paramCount = this.readUnsignedVarInt(); paramIndex < paramCount; ++paramIndex) {
                 let parameter = new CommandParameter();
                 parameter.paramName = this.readString();
                 parameter.paramType = this.readLInt();
                 parameter.isOptional = this.readBool();
                 parameter.byte1 = this.readByte();
 
-                if(parameter.paramType & AvailableCommandsPacket.ARG_FLAG_ENUM){
+                if (parameter.paramType & AvailableCommandsPacket.ARG_FLAG_ENUM) {
                     let index = (parameter.paramType & 0xffff);
                     parameter.enum = this.enums[index] || null;
-                    if(parameter.enum === null){
+                    if (parameter.enum === null) {
                         throw new RangeError(`deserializing ${retval.commandName} parameter ${parameter.paramName}: expected enum at ${index}, but got none`);
                     }
-                }else if(parameter.paramType & AvailableCommandsPacket.ARG_FLAG_POSTFIX){
+                } else if (parameter.paramType & AvailableCommandsPacket.ARG_FLAG_POSTFIX) {
                     let index = (parameter.paramType & 0xffff);
                     parameter.postfix = this.postfixes[index] || null;
-                    if(parameter.postfix === null){
+                    if (parameter.postfix === null) {
                         throw new RangeError(`deserializing ${retval.commandName} parameter ${parameter.paramName}: expected enum at ${index}, but got none`);
                     }
-                } else if((parameter.paramType & AvailableCommandsPacket.ARG_FLAG_VALID) === 0) {
+                } else if ((parameter.paramType & AvailableCommandsPacket.ARG_FLAG_VALID) === 0) {
                     throw new RangeError(`deserializing ${retval.commandName} parameter ${parameter.paramName}: Invalid parameter type 0x" . ${parameter.paramType.toString("hex")}`);
                 }
 
@@ -280,28 +317,28 @@ class AvailableCommandsPacket extends DataPacket {
         let postfixesMap = {};
         let enumMap = {};
         this.commandData.forEach(commandData => {
-           if (commandData.aliases !== null){
-               enumMap[commandData.aliases.enumName] = commandData.aliases;
+            if (commandData.aliases !== null) {
+                enumMap[commandData.aliases.enumName] = commandData.aliases;
 
-               commandData.aliases.enumValues.forEach(str =>{
-                  enumValuesMap[str] = true;
-               });
-           }
+                commandData.aliases.enumValues.forEach(str => {
+                    enumValuesMap[str] = true;
+                });
+            }
 
-           commandData.overloads.forEach(overload => {
-               overload.forEach(parameter => {
-                    if (parameter.enum !== null){
+            commandData.overloads.forEach(overload => {
+                overload.forEach(parameter => {
+                    if (parameter.enum !== null) {
                         enumMap[parameter.enum.enumValues] = parameter.enum;
                         parameter.enum.enumValues.forEach(str => {
-                           enumValuesMap[str] = true;
+                            enumValuesMap[str] = true;
                         });
                     }
 
-                    if (parameter.postfix !== null){
+                    if (parameter.postfix !== null) {
                         postfixesMap[parameter.postfix] = true;
                     }
                 });
-           });
+            });
         });
 
         this.enumValues = Object.keys(enumValuesMap);
@@ -338,4 +375,5 @@ class AvailableCommandsPacket extends DataPacket {
         return session.handleAvailableCommands(this);
     }
 }
+
 module.exports = AvailableCommandsPacket;

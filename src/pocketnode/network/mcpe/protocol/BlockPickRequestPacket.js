@@ -7,7 +7,7 @@ class BlockPickRequestPacket extends DataPacket {
         return ProtocolInfo.BLOCK_PICK_REQUEST_PACKET;
     }
 
-    initVars(){
+    initVars() {
         this.blockX = -1;
         this.blockY = -1;
         this.blockZ = -1;
@@ -31,4 +31,5 @@ class BlockPickRequestPacket extends DataPacket {
         return session.handleBlockPickRequest(this);
     }
 }
+
 module.exports = BlockPickRequestPacket;
