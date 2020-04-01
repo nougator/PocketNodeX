@@ -1,9 +1,10 @@
 class Skin {
-
+    /* Accepted skin sizes */
     static ACCEPTED_SKIN_SIZES = [
         64 * 32 * 4,
         64 * 64 * 4,
-        128 * 128 * 4
+        128 * 128 * 4,
+        64 * 32 + 6
     ];
 
     /** @type {string} */
