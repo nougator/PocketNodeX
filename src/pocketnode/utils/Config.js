@@ -66,7 +66,6 @@ class Config {
                     return confData;
 
                 case "resources":
-                    console.log(resourcesPack.entries);
                     return resourcesPack;
 
                 default:
