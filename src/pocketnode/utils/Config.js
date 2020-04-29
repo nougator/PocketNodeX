@@ -65,7 +65,6 @@ class Config {
                     return bannedNames;
                 
                 case "config":
-                    console.log(confData);
                     return confData;
 
                 default:

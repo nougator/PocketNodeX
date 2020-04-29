@@ -4,7 +4,8 @@
   "description": "Server software written in Javascript for Minecraft: PE",
   "main": "src/pocketnode/PocketNode.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node start",
+    "test": "node start",
     "docs": "rm -rf ./docs && jsdoc ./ -r -c ./jsdoc.json -d docs"
   },
   "keywords": [

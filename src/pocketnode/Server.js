@@ -82,7 +82,7 @@ class Server {
             SFS.copy(this._paths.file + "pocketnode/resources/pocketnode.json", this._paths.data + "pocketnode.json");
         }
         this._config = new Config();
-        this._debuggingLevel = this._config.getElement('misc').debugModelevel;
+        this._debuggingLevel = this._config.RWConf("config", "r");
 
         this.getLogger().setDebugging(this._debuggingLevel);
 
