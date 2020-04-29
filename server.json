@@ -9,8 +9,10 @@
         "ip": "0.0.0.0",
         "name": "PocketNodeX powered server",
         "motd": "Powered by PocketNodeX",
-        "online-mode": true,
-        "max-players": 20,
+        "onlineMode": true,
+        "gameMode": 1,
+        "maxPlayers": 20,
+        "whitelist": false,
         "ignoredPlugins": []
     },
     "world": {
@@ -19,8 +21,8 @@
         "seed": null
     },
     "network": {
-        "batch-threshold": 256,
-        "compression-level": 7
+        "batchThreshold": 256,
+        "compressionLevel": 7
     },
     "misc": {
         "debugModeLevel": 0

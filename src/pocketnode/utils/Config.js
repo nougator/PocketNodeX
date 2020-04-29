@@ -1,11 +1,12 @@
-const confFile = require('../../../server.json'); // (cf stand for ConfigFile)
+// TODO: Adding way to get ops, banneds-ips, banned-names and whitelist
+const confFile = require('../../../server.json');
 const defaultConfig = require('./misc/defaultConfig.json');
 const superagent = require('superagent');
 
-const useRemoteConf = cf.remoteConfig.useRemoteConfig;
-const confData;
+const useRemoteConf = confFile.remoteConfig.useRemoteConfig;
+let confData;
 
-const cachedConfig = {};
+let cachedConfig = {};
 
 if(useRemoteConf) {
     let { body } = superagent
@@ -16,7 +17,7 @@ if(useRemoteConf) {
 }
 
 class Config {
-    getElements(category) {
+    getElement(category) {
         if(!category) return;
 
         switch(category) {

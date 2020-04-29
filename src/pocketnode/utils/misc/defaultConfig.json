@@ -1,0 +1,30 @@
+{
+    "remoteConfig": {
+        "useRemoteConfig": false,
+        "remoteConfigURL": "http://exemple.com/config.json",
+        "checkUpdateFrenquency": 60
+    },
+    "server": {
+        "port": 19132,
+        "ip": "0.0.0.0",
+        "name": "PocketNodeX powered server",
+        "motd": "Powered by PocketNodeX",
+        "onlineMode": true,
+        "gameMode": 1,
+        "maxPlayers": 20,
+        "whitelist": false,
+        "ignoredPlugins": []
+    },
+    "world": {
+        "type": "flat",
+        "name": "Bedrock level",
+        "seed": null
+    },
+    "network": {
+        "batchThreshold": 256,
+        "compressionLevel": 7
+    },
+    "misc": {
+        "debugModeLevel": 0
+    }
+}

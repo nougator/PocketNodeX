@@ -81,8 +81,8 @@ class Server {
         if (!SFS.fileExists(this._paths.data + "pocketnode.json")) {
             SFS.copy(this._paths.file + "pocketnode/resources/pocketnode.json", this._paths.data + "pocketnode.json");
         }
-        this._config = new Config(this.getDataPath() + "pocketnode.json", Config.JSON, {});
-        this._debuggingLevel = this._config.getNested("debugging.level", 0);
+        this._config = new Config();
+        this._debuggingLevel = this._config.getElement('misc').debugModelevel;
 
         this.getLogger().setDebugging(this._debuggingLevel);
 
@@ -92,8 +92,8 @@ class Server {
         this._whitelist = new Config(this.getDataPath() + "whitelist.json", Config.JSON);
         this._bannedNames = new Config(this.getDataPath() + "banned-names.json", Config.JSON);
         this._bannedIps = new Config(this.getDataPath() + "banned-ips.json", Config.JSON);
-        this._maxPlayers = this._config.getNested("server.max-players", 20);
-        this._onlineMode = this._config.getNested("server.online-mode", true);
+        this._maxPlayers = this.getElement("server").maxPlayers;
+        this._onlineMode = this._config.getElement('server').onlineMode;
 
         if (!TRAVIS_BUILD) process.stdout.write("\x1b]0;" + this.getName() + " " + this.getPocketNodeVersion() + "\x07");
 
@@ -408,14 +408,14 @@ class Server {
      * @return {string}
      */
     getIp() {
-        return this._config.getNested("server.ip", "0.0.0.0");
+        return this._config.getElement("server").ip;
     }
 
     /**
      * @return {number}
      */
     getPort() {
-        return this._config.getNested("server.port", 19132);
+        return this._config.getElement("server").port;
     }
 
     /**
@@ -426,21 +426,21 @@ class Server {
     }
 
     getGamemode() {
-        return this._config.getNested("server.gamemode", 1);
+        return this._config.getElement("server").gameMode;
     }
 
     /**
      * @return {boolean}
      */
     hasWhitelist() {
-        return this._config.getNested("server.whitelist", false);
+        return this._config.getElement("server").whitelist;
     }
 
     /**
      * @return {string}
      */
     getMotd() {
-        return this._config.getNested("server.motd", this._pocketnode.NAME + " Server");
+        return this._config.getElement("server").motd;
     }
 
     /**
@@ -621,7 +621,7 @@ class Server {
      * @return {String}
      */
     getLevelType() {
-        return this._config.getNested("level.type", "flat");
+        return this._config.getElement('world').type;
     }
 
     /**
