@@ -915,6 +915,7 @@ class Player extends Human {
         return true;
     }
 
+    // TODO: handle
     handleAnimate(packet) {
         if (this.spawned === false) {
             return true;
@@ -926,12 +927,12 @@ class Player extends Human {
         //     return true;
         // }
 
-        let pk = new AnimatePacket();
-        pk.entityRuntimeId = this.id;
-        pk.action = 1; //TODO
+        // let pk = new AnimatePacket();
+        // pk.entityRuntimeId = this.id;
+        // pk.action = 1; //TODO
         // pk.action = ev.getAnimationType();
         //TODO: edit method of all players and get just this.getViewers();
-        this.server.broadcastPackets(this.server.getOnlinePlayers(), pk);
+        // this.server.broadcastPackets(this.server.getOnlinePlayers(), pk);
     }
 
     handleResourcePackClientResponse(packet) {

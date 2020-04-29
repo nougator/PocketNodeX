@@ -1,2 +1,2 @@
-const PocketNode = require("./");
-const server = PocketNode();
+let PocketNode = require("./");
+PocketNode();

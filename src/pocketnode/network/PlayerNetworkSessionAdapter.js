@@ -59,13 +59,10 @@ class PlayerNetworkSessionAdapter {
     }
 
     handleLogin(packet) {
-        //CheckTypes([LoginPacket, packet]);
-
         return this.player.handleLogin(packet);
     }
 
     handleClientToServerHandshake(packet) {
-        //CheckTypes([])
         return false;
     }
 

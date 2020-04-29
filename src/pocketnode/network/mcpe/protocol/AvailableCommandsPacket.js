@@ -93,7 +93,7 @@ class AvailableCommandsPacket extends DataPacket {
         return 0x1000000
     };
 
-    getId() {
+    static getId() {
         return ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
     }
 

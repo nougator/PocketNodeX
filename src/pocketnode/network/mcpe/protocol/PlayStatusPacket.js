@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class PlayStatusPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
+    /** @type {number} */
+    status;
 
     static get LOGIN_SUCCESS() {
         return 0
@@ -37,11 +35,6 @@ class PlayStatusPacket extends DataPacket {
 
     static getId() {
         return ProtocolInfo.PLAY_STATUS_PACKET;
-    }
-
-    initVars() {
-        this.status = -1;
-
     }
 
     canBeSentBeforeLogin() {
