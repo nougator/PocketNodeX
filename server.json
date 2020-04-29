@@ -13,6 +13,8 @@
         "gameMode": 1,
         "maxPlayers": 20,
         "whitelist": false,
+        "lang": "en",
+        "autoInstallPluginsDependencies": true, 
         "ignoredPlugins": []
     },
     "world": {

@@ -32,7 +32,7 @@ function PocketNode(paths) {
     }
 
     let config = new Config(path.data + "pocketnode.json", Config.JSON, {});
-    this.localizationManager = new localizationManager(config.getNested("server.language", "en"));
+    this.localizationManager = new localizationManager(config.RWConf('config', 'r').server.lang);
     this.localizationManager.loadLanguages();
 
     logger.info(this.localizationManager.getPhrase("loading"));

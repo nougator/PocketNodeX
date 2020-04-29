@@ -92,8 +92,8 @@ class Server {
         this._whitelist = new Config(this.getDataPath() + "whitelist.json", Config.JSON);
         this._bannedNames = new Config(this.getDataPath() + "banned-names.json", Config.JSON);
         this._bannedIps = new Config(this.getDataPath() + "banned-ips.json", Config.JSON);
-        this._maxPlayers = this.getElement("server").maxPlayers;
-        this._onlineMode = this._config.getElement('server').onlineMode;
+        this._maxPlayers = this._config.RWConf("config", "r").server.maxPlayers;
+        this._onlineMode = this._config.RWConf("config", "r").server.onlineMode;
 
         if (!TRAVIS_BUILD) process.stdout.write("\x1b]0;" + this.getName() + " " + this.getPocketNodeVersion() + "\x07");
 
@@ -408,14 +408,14 @@ class Server {
      * @return {string}
      */
     getIp() {
-        return this._config.getElement("server").ip;
+        return this._config.RWConf("config", "r").server.ip;
     }
 
     /**
      * @return {number}
      */
     getPort() {
-        return this._config.getElement("server").port;
+        return this._config.RWConf("config", "r").server.port;
     }
 
     /**
@@ -426,21 +426,21 @@ class Server {
     }
 
     getGamemode() {
-        return this._config.getElement("server").gameMode;
+        return this._config.RWConf("config", "r").server.gameMode;
     }
 
     /**
      * @return {boolean}
      */
     hasWhitelist() {
-        return this._config.getElement("server").whitelist;
+        return this._config.RWConf("config", "r").server.whitelist;
     }
 
     /**
      * @return {string}
      */
     getMotd() {
-        return this._config.getElement("server").motd;
+        return this._config.RWConf("config", "r").server.motd;
     }
 
     /**
@@ -621,7 +621,7 @@ class Server {
      * @return {String}
      */
     getLevelType() {
-        return this._config.getElement('world').type;
+        return this._config.RWConf("config", "r").world.type;
     }
 
     /**
