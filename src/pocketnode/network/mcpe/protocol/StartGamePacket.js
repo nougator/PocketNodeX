@@ -1,11 +1,6 @@
 const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
-const RuntimeBlockMapping = require("./types/RuntimeBlockMapping");
-const NetworkBinaryStream = require("../NetworkBinaryStream");
-const BinaryStream = require("../../../../binarystream/BinaryStream");
-// const data = require('../../../resources/blocks.nbt').data;
 const fs = require('fs');
-const Base64 = require('../../../utils/Base64');
 
 class StartGamePacket extends DataPacket {
     static getId() {
@@ -87,8 +82,9 @@ class StartGamePacket extends DataPacket {
 
         this.writeVarInt(0); // enchantment seed
 
-        let blocks = fs.readFileSync(__dirname + '/../../../resources/blocks.nbt');
-        let buf = Buffer.from(blocks, 'base64');
+        // TODO: block states
+        // let blocks = fs.readFileSync(__dirname + '/../../../resources/blocks.nbt');
+        // let buf = Buffer.from(blocks, 'base64');
         // this.append(buf);
 
         this.writeVarInt(0); // item length

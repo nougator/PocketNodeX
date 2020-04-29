@@ -8,7 +8,7 @@ class RiderJumpPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.RIDER_JUMP_PACKET;
     }
 

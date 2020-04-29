@@ -9,7 +9,7 @@ class CommandOutputPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.COMMAND_OUTPUT_PACKET;
     }
 

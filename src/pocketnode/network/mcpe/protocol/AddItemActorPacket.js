@@ -13,7 +13,7 @@ class AddItemActorPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ADD_ITEM_ACTOR_PACKET;
     }
 
@@ -35,8 +35,8 @@ class AddItemActorPacket extends DataPacket {
     }
 
     _decodePayload() {
-        this.entityUniqueId = this.getEntityUniqueId();
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityUniqueId = this.readEntityUniqueId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         // todo: this.item = this.readSlot();
     }
 }

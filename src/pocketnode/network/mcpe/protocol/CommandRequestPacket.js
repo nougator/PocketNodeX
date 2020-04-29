@@ -8,7 +8,7 @@ class CommandRequestPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.COMMAND_REQUEST_PACKET;
     }
 

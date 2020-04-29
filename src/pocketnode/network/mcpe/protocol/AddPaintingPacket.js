@@ -23,9 +23,9 @@ class AddPaintingPacket extends DataPacket {
     }
 
     _decodePayload() {
-        this.entityUniqueId = this.getEntityUniqueId();
-        this.entityRuntimeId = this.getEntityRuntimeId();
-        this.position = this.getVector3Obj();
+        this.entityUniqueId = this.readEntityUniqueId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
+        this.position = this.readVector3();
         this.direction = this.readVarInt();
         this.title = this.readString();
     }
@@ -33,7 +33,7 @@ class AddPaintingPacket extends DataPacket {
     _encodePayload() {
         this.writeEntityUniqueId(this.entityUniqueId || this.entityRuntimeId);
         this.writeEntityRuntimeId(this.entityRuntimeId);
-        this.writeVector3Obj(this.position);
+        this.writeVector3(this.position);
         this.writeVarInt(this.direction);
         this.writeString(this.title);
     }

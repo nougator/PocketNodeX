@@ -263,13 +263,13 @@ class LevelEventPacket extends DataPacket {
 
     _decodePayload() {
         this.evid = this.readVarInt();
-        this.position = this.getVector3Obj();
-        this.data = this.getVector3Obj();
+        this.position = this.readVector3();
+        this.data = this.readVector3();
     }
 
     _encodePayload() {
         this.writeVarInt(this.evid);
-        this.writeVector3Nullable(this.position);
+        this.writeVector3(this.position);  // nullable
         this.writeVarInt(this.data);
     }
 

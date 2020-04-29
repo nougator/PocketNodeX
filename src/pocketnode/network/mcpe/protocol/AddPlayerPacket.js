@@ -8,7 +8,7 @@ class AddPlayerPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ADD_PLAYER_PACKET;
     }
 
@@ -78,8 +78,8 @@ class AddPlayerPacket extends DataPacket {
         this.writeEntityUniqueId(this.entityUniqueId ? this.entityRuntimeId : this.entityRuntimeId);
         this.writeEntityRuntimeId(this.entityRuntimeId);
         this.writeString(this.platformChatId);
-        this.writeVector3Obj(this.position);
-        this.writeVector3Obj(this.motion); //TODO: nullable
+        this.writeVector3(this.position);
+        this.writeVector3(this.motion); //TODO: nullable
         this.writeLFloat(this.pitch);
         this.writeLFloat(this.yaw);
         this.writeLFloat(this.headYaw ? this.yaw : this.yaw);
@@ -94,7 +94,9 @@ class AddPlayerPacket extends DataPacket {
 
         this.writeLLong(this.long1);
 
-        this.writeUnsignedVarInt(this.links.length);
+        // TODO
+        // this.writeUnsignedVarInt(this.links.length);
+        this.writeUnsignedVarInt(0);
         this.links.forEach(link => {
             //TODO: this.writeEntityLink(link);
         });

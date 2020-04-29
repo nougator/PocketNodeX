@@ -8,7 +8,7 @@ class ActorPickRequestPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ACTOR_PICK_REQUEST_PACKET;
     }
 

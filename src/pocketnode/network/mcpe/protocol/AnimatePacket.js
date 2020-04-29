@@ -20,7 +20,7 @@ class AnimatePacket extends DataPacket {
         return 4
     };
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ANIMATE_PACKET;
     }
 
@@ -35,7 +35,7 @@ class AnimatePacket extends DataPacket {
 
     _decodePayload() {
         this.action = this.readVarInt();
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         if (this.action & 0x80) {
             this.float = this.readLFloat();
         }

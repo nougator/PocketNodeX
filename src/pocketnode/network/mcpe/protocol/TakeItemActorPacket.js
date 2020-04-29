@@ -20,8 +20,8 @@ class TakeItemActorPacket extends DataPacket {
     }
 
     _decodePayload() {
-        this.target = this.getEntityRuntimeId();
-        this.eid = this.getEntityRuntimeId();
+        this.target = this.readEntityRuntimeId();
+        this.eid = this.readEntityRuntimeId();
     }
 
     _encodePayload() {

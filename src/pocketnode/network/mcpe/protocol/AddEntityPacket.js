@@ -8,7 +8,7 @@ class AddEntityPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ADD_ENTITY_PACKET;
     }
 

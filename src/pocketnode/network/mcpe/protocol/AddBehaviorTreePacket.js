@@ -8,7 +8,7 @@ class AddBehaviorTreePacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ADD_BEHAVIOR_TREE_PACKET;
     }
 

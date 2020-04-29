@@ -8,7 +8,7 @@ class RemoveActorPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.REMOVE_ACTOR_PACKET;
     }
 
@@ -18,11 +18,11 @@ class RemoveActorPacket extends DataPacket {
     }
 
     _decodePayload() {
-        this.entityUniqueId = this.getEntityUniqueId();
+        this.entityUniqueId = this.readEntityUniqueId();
     }
 
     _encodePayload() {
-        this.writeEntityUniqueId(this.getEntityUniqueId());
+        this.writeEntityUniqueId(this.entityUniqueId);
     }
 
     handle(session) {

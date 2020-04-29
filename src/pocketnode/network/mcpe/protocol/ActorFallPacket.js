@@ -8,7 +8,7 @@ class ActorFallPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ACTOR_FALL_PACKET;
     }
 

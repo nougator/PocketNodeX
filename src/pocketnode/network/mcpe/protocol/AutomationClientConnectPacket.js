@@ -8,7 +8,7 @@ class AutomationClientConnectPacket extends DataPacket {
         this.initVars();
     }
 
-    getId() {
+    static getId() {
         return ProtocolInfo.AUTOMATION_CLIENT_CONNECT_PACKET;
     }
 

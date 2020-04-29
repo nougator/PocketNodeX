@@ -165,7 +165,7 @@ class ActorEventPacket extends DataPacket {
 
     //TODO: add more events
 
-    getId() {
+    static getId() {
         return ProtocolInfo.ACTOR_EVENT_PACKET;
     }
 
@@ -179,7 +179,7 @@ class ActorEventPacket extends DataPacket {
     }
 
     _decodePayload() {
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         this.event = this.readByte();
         this.data = this.readVarInt();
     }

@@ -1,1 +1,2 @@
-(require("./"))();
+let PocketNode = require("./");
+PocketNode();

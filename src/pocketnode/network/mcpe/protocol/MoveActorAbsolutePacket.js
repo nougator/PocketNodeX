@@ -18,7 +18,7 @@ class MoveActorAbsolutePacket extends DataPacket {
         return 0x02
     };
 
-    getId() {
+    static getId() {
         return ProtocolInfo.MOVE_ACTOR_ABSOLUTE_PACKET;
     }
 
@@ -38,9 +38,9 @@ class MoveActorAbsolutePacket extends DataPacket {
     }
 
     _decodePayload() {
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         this.flags = this.readByte();
-        this.position = this.getVector3Obj();
+        this.position = this.readVector3();
         this.xRot = this.readByteRotation();
         this.yRot = this.readByteRotation();
         this.zRot = this.readByteRotation();
@@ -49,7 +49,7 @@ class MoveActorAbsolutePacket extends DataPacket {
     _encodePayload() {
         this.writeEntityRuntimeId(this.entityRuntimeId);
         this.writeByte(this.flags);
-        this.writeVector3Obj(this.position);
+        this.writeVector3(this.position);
         this.writeByteRotation(this.xRot);
         this.writeByteRotation(this.yRot);
         this.writeByteRotation(this.zRot);
