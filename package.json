@@ -25,6 +25,7 @@
     "pocketnode-binarystream": "git+https://github.com/PocketNode/PocketNode-BinaryStream.git",
     "pocketnode-language": "git+https://github.com/PocketNode/PocketNode-Language.git",
     "raknet": "git+https://github.com/PocketNode/RakNet.git",
+    "superagent": "^5.2.2",
     "time-stamp": "^2.0.0"
   },
   "devDependencies": {
