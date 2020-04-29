@@ -88,8 +88,8 @@ class Server {
 
         //this._scheduler
 
-        this._ops = new Config(this.getDataPath() + "ops.json", Config.JSON);
-        this._whitelist = new Config(this.getDataPath() + "whitelist.json", Config.JSON);
+        this._ops = new Config().RWConf("ops", "r");
+        this._whitelist = new Config().RWConf("whitelist", "r");
         this._bannedNames = new Config(this.getDataPath() + "banned-names.json", Config.JSON);
         this._bannedIps = new Config(this.getDataPath() + "banned-ips.json", Config.JSON);
         this._maxPlayers = this._config.RWConf("config", "r").server.maxPlayers;

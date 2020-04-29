@@ -21,11 +21,10 @@ class ResourcePackManager {
         }
 
         this._config = new Config(path + "resource_packs.json", Config.JSON, {});
-        this._forceResources = Boolean(this._config.get("force", false));
+        this._forceResources = Boolean(this._config.RWConf("config", "r").forceResourcesPack);
 
         server.getLogger().info("Loading resource packs...");
-
-        this._config.get("entries", []).forEach((pack, priority) => {
+        this._config.RWConf("resources", "r").entries.forEach((pack, priority) => {
             try {
                 let packPath = SFS.normalize(path + "/" + pack);
                 if (SFS.fileExists(packPath)) {

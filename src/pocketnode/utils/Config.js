@@ -11,6 +11,7 @@ const whitelistPath = "../../../whitelist.json";
 
 const confFile = require("../../../server.json");
 // const defaultConfig = require("./misc/defaultConfig.json");
+const resourcesPack = require("../../../resource_packs/resource_packs.json");
 const bannedIps = require(bannedIpsPath);
 const bannedNames = require(bannedNamesPath);
 const ops = require(opsPath);
@@ -40,13 +41,10 @@ class Config {
     /**
      * 
      * @param {string} category - Accepted values ops, bannedIps, bannedNames, whitlist and config
-     * @param {string} mode - 
-     * @param {*} content 
+     * @param {string} mode - Accepted values r or w
+     * @param {*} content - Accepted values every JSON (not stringifyed)
      */
     RWConf(category, mode, content) {
-        mode = mode.toLocaleLowerCase();
-        category = category.toLocaleLowerCase();
-
         if(!category) return;
         if(mode != 'r' | 'w') return;
 
@@ -66,6 +64,10 @@ class Config {
                 
                 case "config":
                     return confData;
+
+                case "resources":
+                    console.log(resourcesPack.entries);
+                    return resourcesPack;
 
                 default:
                     return;
@@ -89,7 +91,11 @@ class Config {
                 case "whitelist":
                     write(whitelistPath, content);
                     return;
-
+                /*
+                case "resources":
+                    write(resourcePackPath, content);
+                    return;
+                */
                 default:
                     return;
             }
