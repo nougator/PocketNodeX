@@ -2,6 +2,10 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class PlayStatusPacket extends DataPacket {
+    static getId() {
+        return ProtocolInfo.PLAY_STATUS_PACKET;
+    }
+
     /** @type {number} */
     status;
 
@@ -31,10 +35,6 @@ class PlayStatusPacket extends DataPacket {
 
     static get LOGIN_FAILED_EDU_VANILLA() {
         return 6
-    }
-
-    static getId() {
-        return ProtocolInfo.PLAY_STATUS_PACKET;
     }
 
     canBeSentBeforeLogin() {

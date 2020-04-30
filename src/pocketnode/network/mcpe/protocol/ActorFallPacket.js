@@ -2,21 +2,16 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ActorFallPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.ACTOR_FALL_PACKET;
     }
 
-    initVars() {
-        this.entityRuntimeId = -1;
-        this.fallDistance = -1;
-        this.isInVoid = false;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    fallDistance;
+    /** @type {boolean} */
+    isInVoid = false;
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

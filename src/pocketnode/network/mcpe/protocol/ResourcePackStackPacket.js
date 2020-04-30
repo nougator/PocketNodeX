@@ -9,13 +9,15 @@ class ResourcePackStackPacket extends DataPacket {
     /** @type {boolean} */
     mustAccept = false;
 
+    /** @type {any} */
     behaviorPackStack = [];
+    /** @type {any} */
     resourcePackStack = [];
 
     /** @type {boolean} */
     isExperimental = false;
     /** @type {string} */
-    baseGameVersion = '1.14.0';
+    baseGameVersion = ProtocolInfo.VERSION;
 
     _decodePayload() {
         this.mustAccept = this.readBool();

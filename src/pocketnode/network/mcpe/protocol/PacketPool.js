@@ -6,6 +6,8 @@ const DisconnectPacket = require("./DisconnectPacket");
 const MovePlayerPacket = require("./MovePlayerPacket");
 const NetworkStackLatencyPacket = require("./NetworkStackLatencyPacket");
 const PlayerActionPacket = require("./PlayerActionPacket");
+const PlayerHotbarPacket = require("./PlayerHotbarPacket");
+const PlayerInputPacket = require("./PlayerInputPacket");
 const InteractPacket = require("./InteractPacket");
 const LevelSoundEventPacket = require("./LevelSoundEventPacket");
 const SubClientLoginPacket = require("./SubClientLoginPacket");
@@ -32,29 +34,36 @@ const TextPacket = require("./TextPacket");
 const SetDefaultGameTypePacket = require("./SetDefaultGameTypePacket");
 const SetPlayerGameTypePacket = require("./SetPlayerGameTypePacket");
 const AddPlayerPacket = require("./AddPlayerPacket");
+const AddEntityPacket = require("./AddEntityPacket");
 const ActorEventPacket = require("./ActorEventPacket");
 const AddActorPacket = require("./AddActorPacket");
 const RemoveActorPacket = require("./RemoveActorPacket");
 const AddItemActorPacket = require("./AddItemActorPacket");
 const AddPaintingPacket = require("./AddPaintingPacket");
+const AddBehaviorTreePacket = require("./AddBehaviorTreePacket");
 const AvailableCommandsPacket = require("./AvailableCommandsPacket");
 const AutomationClientConnectPacket = require("./AutomationClientConnectPacket");
 const TakeItemActorPacket = require("./TakeItemActorPacket");
 const MoveActorAbsolutePacket = require("./MoveActorAbsolutePacket");
 const RiderJumpPacket = require("./RiderJumpPacket");
 const UpdateBlockPacket = require("./UpdateBlockPacket");
+const BlockPickRequestPacket = require("./BlockPickRequestPacket");
 const SetTitlePacket = require("./SetTitlePacket");
-const ExplodePacket = require("./ExplodePacket");
+const TickSyncPacket = require("./TickSyncPacket");
 const LevelSoundEventPacketV1 = require("./LevelSoundEventPacketV1");
+const ResourcePackChunkDataPacket = require("./ResourcePackChunkDataPacket");
+const ResourcePackChunkResponsePacket = require("./ResourcePackClientResponsePacket");
+const ResourcePackDataInfoPacket = require("./ResourcePackDataInfoPacket");
 const LevelEventPacket = require("./LevelEventPacket");
 const MobEffectPacket = require("./MobEffectPacket");
+const AdventureSettingsPacket = require("./AdventureSettingsPacket");
 const InventoryTransactionPacket = require("./InventoryTransactionPacket");
 const MobEquipmentPacket = require("./MobEquipmentPacket");
 const MobArmorEquipmentPacket = require("./MobArmorEquipmentPacket");
 const AvailableActorIdentifiersPacket = require("./AvailableActorIdentifiersPacket");
 const ActorFallPacket = require("./ActorFallPacket");
-const PlayerInputPacket = require("./PlayerInputPacket");
 const LevelChunkPacket = require("./LevelChunkPacket");
+const ActorPickRequestPacket = require("./ActorPickRequestPacket");
 
 class PacketPool {
 
@@ -97,7 +106,7 @@ class PacketPool {
         this.registerPacket(RiderJumpPacket);
         this.registerPacket(UpdateBlockPacket);
         this.registerPacket(AddPaintingPacket);
-        this.registerPacket(ExplodePacket);
+        this.registerPacket(TickSyncPacket);
         this.registerPacket(LevelSoundEventPacketV1);
         this.registerPacket(LevelEventPacket);
         this.registerPacket(BlockEventPacket);
@@ -109,13 +118,22 @@ class PacketPool {
         this.registerPacket(MobArmorEquipmentPacket);
         this.registerPacket(InteractPacket);
 
+        this.registerPacket(ActorPickRequestPacket);
+        this.registerPacket(AddBehaviorTreePacket);
+        this.registerPacket(AddEntityPacket);
+        this.registerPacket(AdventureSettingsPacket);
+        this.registerPacket(BlockPickRequestPacket);
+        this.registerPacket(PlayerHotbarPacket);
+        this.registerPacket(PlayerInputPacket);
+        this.registerPacket(ResourcePackChunkDataPacket);
+        this.registerPacket(ResourcePackChunkResponsePacket);
+        this.registerPacket(ResourcePackDataInfoPacket);
 
         this.registerPacket(LevelSoundEventPacket);
         this.registerPacket(PlayerActionPacket);
         this.registerPacket(ActorFallPacket);
         this.registerPacket(PlayerInputPacket);
         this.registerPacket(LevelChunkPacket);
-
 
         this.registerPacket(UpdateSoftEnumPacket);
         this.registerPacket(AnimatePacket);

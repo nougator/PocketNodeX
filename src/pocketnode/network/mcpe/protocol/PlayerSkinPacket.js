@@ -9,10 +9,10 @@ class PlayerSkinPacket extends DataPacket {
         return ProtocolInfo.PLAYER_SKIN_PACKET;
     }
 
-    initVars() {
-        this.uuid = null;
-        this.skin = null;
-    }
+    // TODO: type
+
+    uuid;
+    skin;
 
     _decodePayload() {
         this.uuid = this.readUUID();

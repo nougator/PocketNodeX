@@ -2,20 +2,12 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class RemoveActorPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.REMOVE_ACTOR_PACKET;
     }
 
-    initVars() {
-        /** @type {number} */
-        this.entityUniqueId = -1;
-    }
+    /** @type {number} */
+    entityUniqueId
 
     _decodePayload() {
         this.entityUniqueId = this.readEntityUniqueId();

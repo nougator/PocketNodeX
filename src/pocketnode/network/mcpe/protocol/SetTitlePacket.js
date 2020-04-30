@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const MinecraftInfo = require("../Info");
 
 class SetTitlePacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return MinecraftInfo.SET_TITLE_PACKET;
     }
 
     static get TYPE_CLEAR_TITLE() {
@@ -32,17 +30,16 @@ class SetTitlePacket extends DataPacket {
         return 5
     };
 
-    static getId() {
-        return MinecraftInfo.SET_TITLE_PACKET;
-    }
-
-    initVars() {
-        this.type = 0;
-        this.text = "";
-        this.fadeInTime = 0;
-        this.stayTime = 0;
-        this.fadeOutTime = 0;
-    }
+    /** @type {number} */
+    type = 0;
+    /** @type {string} */
+    text = "";
+    /** @type {number} */
+    fadeInTime = 0;
+    /** @type {number} */
+    stayTime = 0;
+    /** @type {number} */
+    fadeOutTime = 0;
 
     _decodePayload() {
         this.type = this.readVarInt();

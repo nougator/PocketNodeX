@@ -2,20 +2,12 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class RiderJumpPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.RIDER_JUMP_PACKET;
     }
 
-    initVars() {
-        /** @type {number} */
-        this.jumpStrenght = -1; //percentage
-    }
+    /** @type {number} */
+    jumpStrenght;  // percentage
 
     _decodePayload() {
         this.jumpStrenght = this.readVarInt();
@@ -28,7 +20,6 @@ class RiderJumpPacket extends DataPacket {
     handle(session) {
         return session.handleRiderJump(this);
     }
-
 }
 
 module.exports = RiderJumpPacket;

@@ -2,19 +2,14 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePackChunkRequestPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET;
     }
 
-    initVars() {
-        this.packId = "";
-        this.chunkIndex = 0;
-    }
+    /** @type {string} */
+    packId;
+    /** @type {number} */
+    chunkIndex;
 
     _decodePayload() {
         this.packId = this.readString();

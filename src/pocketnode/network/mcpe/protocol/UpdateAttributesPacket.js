@@ -6,10 +6,10 @@ class UpdateAttributesPacket extends DataPacket {
         return ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;
     }
 
-    initVars() {
-        this.entityRuntimeId = -1;
-        this.entries = [];
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {any} */
+    entries = [];
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

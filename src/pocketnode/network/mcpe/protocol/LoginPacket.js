@@ -6,6 +6,9 @@ const BinaryStream = require("../NetworkBinaryStream");
 const Utils = require("../../../utils/Utils");
 
 class LoginPacket extends DataPacket {
+    static getId() {
+        return ProtocolInfo.LOGIN_PACKET;
+    }
 
     /** @type {string} */
     username = '';
@@ -27,10 +30,6 @@ class LoginPacket extends DataPacket {
     clientDataJwt;
     /** @type {any} */
     clientData;
-
-    static getId() {
-        return ProtocolInfo.LOGIN_PACKET;
-    }
 
     canBeSentBeforeLogin() {
         return true;

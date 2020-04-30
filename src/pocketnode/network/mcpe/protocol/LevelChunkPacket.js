@@ -2,24 +2,22 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class LevelChunkPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.LEVEL_CHUNK_PACKET;
     }
 
-    initVars() {
-        this.chunkX = 0;
-        this.chunkZ = 0;
-        this.subChunkCount = 0;
-        this.cacheEnabled = false;
-        this.usedBlobHashes = [];
-        this.extraPayload = "";
-    }
+    /** @type {number} */
+    chunkX = 0;
+    /** @type {number} */
+    chunkZ = 0;
+    /** @type {number} */
+    subChunkCount = 0;
+    /** @type {boolean} */
+    cacheEnabled = false;
+    /** @type {any} */
+    usedBlobHashes = [];
+    /** @type {string} */
+    extraPayload;
 
     _decodePayload() {
         this.chunkX = this.readVarInt();

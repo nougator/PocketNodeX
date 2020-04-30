@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class MobEffectPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.MOB_EFFECT_PACKET;
     }
 
     static get EVENT_ADD() {
@@ -20,18 +18,18 @@ class MobEffectPacket extends DataPacket {
         return 3
     };
 
-    static getId() {
-        return ProtocolInfo.MOB_EFFECT_PACKET;
-    }
-
-    initVars() {
-        this.entityRuntimeId = -1;
-        this.eventId = -1;
-        this.effectId = -1;
-        this.amplifier = 0;
-        this.particles = true;
-        this.duration = 0;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    eventId;
+    /** @type {number} */
+    effectId;
+    /** @type {number} */
+    amplifier = 0;
+    /** @type {boolean} */
+    particles = true;
+    /** @type {number} */
+    duration = 0;
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

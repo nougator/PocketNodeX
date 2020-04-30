@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class TextPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.TEXT_PACKET;
     }
 
     static get TYPE_RAW() {
@@ -48,19 +46,20 @@ class TextPacket extends DataPacket {
         return 9
     }
 
-    static getId() {
-        return ProtocolInfo.TEXT_PACKET;
-    }
-
-    initVars() {
-        this.type = -1;
-        this.needsTranslation = false;
-        this.sourceName = "";
-        this.message = "";
-        this.parameters = [];
-        this.xboxUserId = "";
-        this.platformChatId = "";
-    }
+    /** @type {number} */
+    type;
+    /** @type {boolean} */
+    needsTranslation = false;
+    /** @type {string} */
+    sourceName = "";
+    /** @type {string} */
+    message = "";
+    /** @type {any} */
+    parameters = [];
+    /** @type {string} */
+    xboxUserId = "";
+    /** @type {string} */
+    platformChatId = "";
 
     _decodePayload() {
         this.type = this.readByte();

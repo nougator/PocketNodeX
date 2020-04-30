@@ -4,23 +4,20 @@ const ProtocolInfo = require("../Info");
 const Vector3 = require("../../../math/Vector3");
 
 class AddPaintingPacket extends DataPacket {
-
-    getId() {
+    static getId() {
         return ProtocolInfo.ADD_PAINTING_PACKET;
     }
 
-    initVars() {
-        /** @type {number|null} */
-        this.entityUniqueId = null;
-        /** @type {number} */
-        this.entityRuntimeId = -1;
-        /** @type {Vector3} */
-        this.position = null;
-        /** @type {number} */
-        this.direction = -1;
-        /** @type {string} */
-        this.title = "";
-    }
+    /** @type {number|null} */
+    entityUniqueId = null;
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    position = new Vector3();
+    /** @type {Vector3} */
+    direction;
+    /** @type {string} */
+    title = "";
 
     _decodePayload() {
         this.entityUniqueId = this.readEntityUniqueId();

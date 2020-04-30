@@ -2,21 +2,19 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePacksInfoPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;
     }
 
-    initVars() {
-        this.mustAccept = false;
-        this.hasScripts = false;
-        this.behaviorPackEntries = [];
-        this.resourcePackEntries = [];
-    }
+    /** @type {boolean} */
+    mustAccept = false;
+    /** @type {boolean} */
+    hasScripts = false;
+
+    /** @type {any} */
+    behaviorPackEntries = [];
+    /** @type {any} */
+    resourcePackEntries = [];
 
     _decodePayload() {
         this.mustAccept = this.readBool();

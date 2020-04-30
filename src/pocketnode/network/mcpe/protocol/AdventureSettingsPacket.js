@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class AdventureSettingsPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
     }
 
     static get PERMISSION_NORMAL() {
@@ -97,18 +95,18 @@ class AdventureSettingsPacket extends DataPacket {
         return 0x80 | this.BITFLAG_SECOND_SET
     };
 
-    static getId() {
-        return ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
-    }
-
-    initVars() {
-        this.flags = 0;
-        this.commandPermission = AdventureSettingsPacket.PERMISSION_NORMAL;
-        this.flags2 = -1;
-        this.playerPermission = 0; //TODO: PlayerPermission class on /types/
-        this.customFlags = 0;
-        this.entityUniqueId = -1;
-    }
+    /** @type {number} */
+    flags = 0;
+    /** @type {number} */
+    commandPermission = AdventureSettingsPacket.PERMISSION_NORMAL;
+    /** @type {number} */
+    flags2;
+    /** @type {number} */
+    playerPermission = 0;
+    /** @type {number} */
+    customFlags = 0;
+    /** @type {number} */
+    entityUniqueId;
 
     _decodePayload() {
         this.flags = this.readUnsignedVarInt();

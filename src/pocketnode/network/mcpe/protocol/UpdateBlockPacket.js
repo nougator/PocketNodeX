@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class UpdateBlockPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.UPDATE_BLOCK_PACKET;
     }
 
     static get FLAG_NONE() {
@@ -44,24 +42,19 @@ class UpdateBlockPacket extends DataPacket {
         return 1
     };
 
-    static getId() {
-        return ProtocolInfo.UPDATE_BLOCK_PACKET;
-    }
+    /** @type {number} */
+    x;
+    /** @type {number} */
+    y;
+    /** @type {number} */
+    z;
 
-    initVars() {
-        /** @type {number} */
-        this.x = -1;
-        /** @type {number} */
-        this.z = -1;
-        /** @type {number} */
-        this.y = -1;
-        /** @type {number} */
-        this.blockRuntimeId = -1;
-        /** @type {number} */
-        this.flags = -1;
-        /** @type {number} */
-        this.dataLayerId = UpdateBlockPacket.DATA_LAYER_NORMAL;
-    }
+    /** @type {number} */
+    blockRuntimeId;
+    /** @type {number} */
+    flags;
+    /** @type {number} */
+    dataLayerId = UpdateBlockPacket.DATA_LAYER_NORMAL;
 
     _decodePayload() {
         this.readBlockPosition(this.x, this.y, this.z);

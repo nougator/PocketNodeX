@@ -264,7 +264,7 @@ class Session {
                 dpk = new NewIncomingConnection(packet.getStream());
                 dpk.decode();
 
-                if(true || dpk.port === this.sessionManager.getPort()){//todo: if port checking
+                if(dpk.port === this.sessionManager.getPort()){ //todo: if port checking
                     this.setConnected();
 
                     this.sessionManager.openSession(this);

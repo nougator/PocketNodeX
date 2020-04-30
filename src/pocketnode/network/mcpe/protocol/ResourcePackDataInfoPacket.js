@@ -3,19 +3,25 @@ const ProtocolInfo = require("../Info");
 const ResourcePackType = require("./types/ResourcePackType");
 
 class ResourcePackDataInfoPacket extends DataPacket {
+
     static getId() {
         return ProtocolInfo.RESOURCE_PACK_DATA_INFO_PACKET;
     }
 
-    initVars() {
-        this.packId = "";
-        this.maxChunkSize = 0;
-        this.chunkCount = 0;
-        this.compressedPackSize = 0;
-        this.sha256 = "";
-        this.isPremium = false;
-        this.packType = ResourcePackType.RESOURCES; //TODO: check the values for this
-    }
+    /** @type {string} */
+    packId;
+    /** @type {number} */
+    maxChunkSize;
+    /** @type {number} */
+    chunkCount;
+    /** @type {number} */
+    compressedPackSize;
+    /** @type {string} */
+    sha256;
+    /** @type {boolean} */
+    isPremium;
+    /** @type {number} */
+    packType = ResourcePackType.RESOURCES;
 
     _decodePayload() {
         this.packId = this.readString();

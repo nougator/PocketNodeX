@@ -2,20 +2,12 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class AddEntityPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.ADD_ENTITY_PACKET;
     }
 
-    initVars() {
-        /** @type {number} */
-        this.uvarint1d = -1;
-    }
+    /** @type {number} */
+    uvarint1d;
 
     create(uvarint1) {
         let result = new self;

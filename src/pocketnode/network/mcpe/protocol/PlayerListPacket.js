@@ -4,17 +4,17 @@ const ProtocolInfo = require("../Info");
 const PlayerListEntry = require('./types/PlayerListEntry');
 
 class PlayerListPacket extends DataPacket {
+    static getId() {
+        return ProtocolInfo.PLAYER_LIST_PACKET;
+    }
 
     static TYPE_ADD = 0;
     static TYPE_REMOVE = 1;
 
-    // TODO: typess
-    entries = [];
-    type = -1;
-
-    static getId() {
-        return ProtocolInfo.PLAYER_LIST_PACKET;
-    }
+    /** @type {any} */
+    entries = [];  // TODO: complete
+    /** @type {number} */
+    type;
 
     clean() {
         this.entries = [];

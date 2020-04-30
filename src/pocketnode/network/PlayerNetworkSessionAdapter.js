@@ -229,7 +229,7 @@ class PlayerNetworkSessionAdapter {
         return false;
     }
 
-    handleExplode(packet) {
+    handleTickSync(packet) {
         return false;
     }
 

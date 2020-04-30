@@ -2,23 +2,16 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class NetworkStackLatencyPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.NETWORK_STACK_LATENCY_PACKET;
     }
 
-    initVars() {
-        this.timestamp = null;
-        this.needResponse = false;
-    }
+    /** @type {number} */
+    timestamp = null;
+    /** @type {boolean} */
+    needResponse = false;
 
     _decodePayload() {
-        console.log('NetworkStackLatency called! :)');
-
         this.timestamp = this.readLLong();
         this.needResponse = this.readBool();
     }

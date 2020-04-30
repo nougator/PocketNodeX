@@ -4,30 +4,22 @@ const ProtocolInfo = require("../Info");
 const Vector3 = require("../../../math/Vector3");
 
 class LevelSoundEventPacketV1 extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V1;
     }
 
-    initVars() {
-        /** @type {number} */
-        this.sound = -1;
-        /** @type {Vector3} */
-        this.position = null;
-        /** @type {number} */
-        this.extraData = 0;
-        /** @type {number} */
-        this.entityType = 1;
-        /** @type {boolean} */
-        this.isBabyMob = false; //...
-        /** @type {boolean} */
-        this.disableRelativeVolume = false;
-    }
+    /** @type {number} */
+    sound;
+    /** @type {Vector3} */
+    position = new Vector3();
+    /** @type {number} */
+    extraData;
+    /** @type {string} */
+    entityType = ":";
+    /** @type {boolean} */
+    isBabyMob = false;
+    /** @type {boolean} */
+    disableRelativeVolume = false;
 
     _decodePayload() {
         this.sound = this.readByte();

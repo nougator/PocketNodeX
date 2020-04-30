@@ -11,11 +11,11 @@ const Info = {};
 /**
  * Actual Minecraft: PE protocol version
  */
-Info.PROTOCOL = 361;
+Info.PROTOCOL = 390;
 /**
  * Version number sent to clients in ping responses.
  */
-Info.VERSION = "1.12.0";
+Info.VERSION = "1.14.60";
 
 Info.LOGIN_PACKET = 0x01;
 Info.PLAY_STATUS_PACKET = 0x02;
@@ -39,7 +39,7 @@ Info.MOVE_PLAYER_PACKET = 0x13;
 Info.RIDER_JUMP_PACKET = 0x14;
 Info.UPDATE_BLOCK_PACKET = 0x15;
 Info.ADD_PAINTING_PACKET = 0x16;
-Info.EXPLODE_PACKET = 0x17;
+Info.TICK_SYNC_PACKET = 0x17;
 Info.LEVEL_SOUND_EVENT_PACKET_V1 = 0x18;
 Info.LEVEL_EVENT_PACKET = 0x19;
 Info.BLOCK_EVENT_PACKET = 0x1a;

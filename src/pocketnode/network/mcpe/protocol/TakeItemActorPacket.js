@@ -2,22 +2,14 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class TakeItemActorPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.TAKE_ITEM_ACTOR_PACKET;
     }
 
-    initVars() {
-        /** @type {number} */
-        this.target = -1;
-        /** @type {number} */
-        this.eid = -1;
-    }
+    /** @type {number} */
+    target;
+    /** @type {number} */
+    eid;
 
     _decodePayload() {
         this.target = this.readEntityRuntimeId();

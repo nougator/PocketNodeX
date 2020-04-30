@@ -2,22 +2,21 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class BlockEventPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.BLOCK_EVENT_PACKET;
     }
 
-    initVars() {
-        this.x = -1;
-        this.y = -1;
-        this.z = -1;
-        this.eventType = -1;
-        this.eventData = -1;
-    }
+    /** @type {number} */
+    x;
+    /** @type {number} */
+    y;
+    /** @type {number} */
+    z;
+
+    /** @type {number} */
+    eventType;
+    /** @type {number} */
+    eventData;
 
     _decodePayload() {
         this.readBlockPosition(this.x, this.y, this.z);

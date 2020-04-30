@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ActorEventPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.ACTOR_EVENT_PACKET;
     }
 
     static get HURT_ANIMATION() {
@@ -165,18 +163,12 @@ class ActorEventPacket extends DataPacket {
 
     //TODO: add more events
 
-    static getId() {
-        return ProtocolInfo.ACTOR_EVENT_PACKET;
-    }
-
-    initVars() {
-        /** @type {number} */
-        this.entityRuntimeId = -1;
-        /** @type {number} */
-        this.event = -1;
-        /** @type {number} */
-        this.data = 0;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    event;
+    /** @type {number} */
+    data = 0;
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

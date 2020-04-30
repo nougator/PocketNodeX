@@ -2,9 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class ResourcePackClientResponsePacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET;
     }
 
     static get STATUS_REFUSED() {
@@ -23,10 +22,6 @@ class ResourcePackClientResponsePacket extends DataPacket {
         return 4
     }
 
-    static getId() {
-        return ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET;
-    }
-
     static STATUS(status) {
         switch (status) {
             case ResourcePackClientResponsePacket.STATUS_REFUSED:
@@ -40,10 +35,10 @@ class ResourcePackClientResponsePacket extends DataPacket {
         }
     }
 
-    initVars() {
-        this.status = 0;
-        this.packIds = [];
-    }
+    /** @type {number} */
+    status = 0;
+    /** @type {any} */
+    packIds = [];
 
     _decodePayload() {
         this.status = this.readByte();

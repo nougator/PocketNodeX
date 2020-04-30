@@ -3,23 +3,20 @@ const ProtocolInfo = require("../Info");
 const CommandOutputMessage = require("./types/CommandOutputMessage");
 
 class CommandOutputPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.COMMAND_OUTPUT_PACKET;
     }
 
-    initVars() {
-        this.originData = null;
-        this.outputType = -1;
-        this.successCount = -1;
-        this.messages = [];
-        this.unknownString = "";
-    }
+    /** @type {any} */
+    originData;
+    /** @type {number} */
+    outputType;
+    /** @type {number} */
+    successCount;
+    /** @type {any} */
+    messages;
+    /** @type {string} */
+    unknownString;
 
     _decodePayload() {
         this.originData = this.getCommandOriginData();

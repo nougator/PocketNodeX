@@ -2,18 +2,12 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class SetDefaultGameTypePacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.SET_DEFAULT_GAME_TYPE_PACKET;
     }
 
-    initVars() {
-        this.gamemode = -1;
-    }
+    /** @type {number} */
+    gamemode = 0;
 
     _decodePayload() {
         this.gamemode = this.readVarInt();

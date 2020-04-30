@@ -3,12 +3,6 @@ const ProtocolInfo = require("../Info");
 const ScoreboardEntry = require("./types/ScoreboardIdentityPacketEntry");
 
 class SetScoreboardIdentityPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.SET_SCOREBOARD_IDENTITY_PACKET;
     }
@@ -21,11 +15,10 @@ class SetScoreboardIdentityPacket extends DataPacket {
         return 1;
     }
 
-    initVars() {
-
-        this.type = 0;
-        this.entries = [];
-    }
+    /** @type {any} */
+    entries = [];
+    /** @type {number} */
+    type = 0;
 
     _decodePayload() {
         this.type = this.readByte();

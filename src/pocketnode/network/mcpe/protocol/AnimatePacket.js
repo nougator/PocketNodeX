@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class AnimatePacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.ANIMATE_PACKET;
     }
 
     static get ACTION_SWING_ARM() {
@@ -20,18 +18,12 @@ class AnimatePacket extends DataPacket {
         return 4
     };
 
-    static getId() {
-        return ProtocolInfo.ANIMATE_PACKET;
-    }
-
-    initVars() {
-        /** @type {number} */
-        this.action = -1;
-        /** @type {number} */
-        this.entityRuntimeId = -1;
-        /** @type {number} */
-        this.float = 0.0; //TODO (Boat rowing time?)
-    }
+    /** @type {number} */
+    action;
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    float = 0.0; //TODO (Boat rowing time?)
 
     _decodePayload() {
         this.action = this.readVarInt();

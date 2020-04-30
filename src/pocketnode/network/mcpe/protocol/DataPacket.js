@@ -5,11 +5,8 @@ const Attribute = require("../../../entity/Attribute");
 
 class DataPacket extends BinaryStream {
 
-    constructor() {
-        super();
-
-        this.isEncoded = false;
-    }
+    /** @type {boolean} */
+    isEncoded = false;
 
     static getId() {
         return 0;

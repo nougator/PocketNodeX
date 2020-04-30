@@ -2,24 +2,18 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class DisconnectPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.DISCONNECT_PACKET;
-    }
-
-    initVars() {
-        this.hideDisconnectionScreen = false;
-        this.message = "";
     }
 
     canBeSentBeforeLogin() {
         return true;
     }
+
+    /** @type {boolean} */
+    hideDisconnectionScreen = false;
+    /** @type {string} */
+    message;
 
     _decodePayload() {
         this.hideDisconnectionScreen = this.readBool();

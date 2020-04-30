@@ -175,7 +175,6 @@ class SessionManager {
     }
 
     createSession(address, port, clientId, mtuSize) {
-        let addr = new InternetAddress(address, port, 4); // todo
         let session = new Session(this, address, port, clientId, mtuSize);
         this._sessions.set(SessionManager.hashAddress(address, port), session);
         this.getLogger().debug(`Created session for ${session.toString()} with MTU size ${mtuSize}`);

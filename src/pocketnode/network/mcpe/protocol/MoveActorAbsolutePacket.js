@@ -4,10 +4,8 @@ const ProtocolInfo = require("../Info");
 const Vector3 = require("../../../math/Vector3");
 
 class MoveActorAbsolutePacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.MOVE_ACTOR_ABSOLUTE_PACKET;
     }
 
     static get FLAG_GROUND() {
@@ -18,24 +16,19 @@ class MoveActorAbsolutePacket extends DataPacket {
         return 0x02
     };
 
-    static getId() {
-        return ProtocolInfo.MOVE_ACTOR_ABSOLUTE_PACKET;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    flags = 0;
+    /** @type {Vector3} */
+    position = new Vector3();
 
-    initVars() {
-        /** @type {number} */
-        this.entityRuntimeId = -1;
-        /** @type {number} */
-        this.flags = 0;
-        /** @type {Vector3} */
-        this.position = new Vector3();
-        /** @type {number} */
-        this.xRot = -1;
-        /** @type {number} */
-        this.yRot = -1;
-        /** @type {number} */
-        this.zRot = -1;
-    }
+    /** @type {number} */
+    xRot;
+    /** @type {number} */
+    yRot;
+    /** @type {number} */
+    zRot;
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

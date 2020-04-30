@@ -2,21 +2,16 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class UpdateSoftEnumPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.UPDATE_SOFT_ENUM_PACKET;
     }
 
-    initVars() {
-        this.enumName = "";
-        this.values = [];
-        this.type = 0;
-    }
+    /** @type {string} */
+    enumName = "";
+    /** @type {any} */
+    values = [];
+    /** @type {number} */
+    type = 0;
 
     _decodePayload() {
         this.enumName = this.readString();

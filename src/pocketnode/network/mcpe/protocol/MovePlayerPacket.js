@@ -1,11 +1,11 @@
 const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
-class MovePlayerPacket extends DataPacket {
+const Vector3 = require("../../../math/Vector3");
 
-    constructor() {
-        super();
-        this.initVars();
+class MovePlayerPacket extends DataPacket {
+    static getId() {
+        return ProtocolInfo.MOVE_PLAYER_PACKET;
     }
 
     static get MODE_NORMAL() {
@@ -48,27 +48,28 @@ class MovePlayerPacket extends DataPacket {
         return 5
     }
 
-    static getId() {
-        return ProtocolInfo.MOVE_PLAYER_PACKET;
-    }
-
-    initVars() {
-        this.entityRuntimeId = -1;
-        this.position = [0, 0, 0];
-        this.pitch = 0.0;
-        this.yaw = 0.0;
-        this.headYaw = 0.0;
-        this.mode = MovePlayerPacket.MODE_NORMAL;
-        this.onGround = false; //TODO
-        this.ridingEid = 0;
-        this.teleportCause = 0;
-        this.teleportItem = 0;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {Vector3} */
+    position = new Vector3();
+    /** @type {number} */
+    pitch = 0.0;
+    /** @type {number} */
+    yaw = 0.0;
+    /** @type {number} */
+    headYaw = 0.0;
+    /** @type {number} */
+    mode = MovePlayerPacket.MODE_NORMAL;
+    /** @type {boolean} */
+    onGround = false;
+    /** @type {number} */
+    ridingEid = 0;
+    /** @type {number} */
+    teleportCause = 0;
+    /** @type {number} */
+    teleportItem = 0;
 
     _decodePayload() {
-
-        //console.log("MovePlayerPacket got called!");
-
         this.entityRuntimeId = this.readEntityRuntimeId();
         this.position = this.readVector3();
         this.pitch = this.readLFloat();
@@ -99,7 +100,6 @@ class MovePlayerPacket extends DataPacket {
     }
 
     handle(session) {
-
         return session.handleMovePlayer(this);
     }
 

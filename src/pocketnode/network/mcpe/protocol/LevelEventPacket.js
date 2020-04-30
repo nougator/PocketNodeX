@@ -2,10 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class LevelEventPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.LEVEL_EVENT_PACKET;
     }
 
     static get EVENT_SOUND_CLICK() {
@@ -251,15 +249,12 @@ class LevelEventPacket extends DataPacket {
         return 0x4000
     };
 
-    static getId() {
-        return ProtocolInfo.LEVEL_EVENT_PACKET;
-    }
-
-    initVars() {
-        this.evid = -1;
-        this.position = null;
-        this.data = -1;
-    }
+    /** @type {number} */
+    evid;
+    /** @type {any} */
+    position;
+    /** @type {number} */
+    data;
 
     _decodePayload() {
         this.evid = this.readVarInt();

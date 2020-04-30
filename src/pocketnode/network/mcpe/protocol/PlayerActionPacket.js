@@ -2,9 +2,8 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class PlayerActionPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.PLAYER_ACTION_PACKET;
     }
 
     static get ACTION_START_BREAK() {
@@ -105,18 +104,19 @@ class PlayerActionPacket extends DataPacket {
         return 25
     };
 
-    static getId() {
-        return ProtocolInfo.PLAYER_ACTION_PACKET;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {number} */
+    action;
 
-    initVars() {
-        this.entityRuntimeId = -1;
-        this.action = -1;
-        this.x = -1;
-        this.y = -1;
-        this.z = -1;
-        this.face = -1;
-    }
+    /** @type {number} */
+    x;
+    /** @type {number} */
+    y;
+    /** @type {number} */
+    z;
+    /** @type {number} */
+    face;
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

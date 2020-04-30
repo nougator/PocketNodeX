@@ -2,10 +2,21 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class InteractPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.INTERACT_PACKET;
     }
+
+    /** @type {number} */
+    action;
+    /** @type {number} */
+    target;
+
+    /** @type {number} */
+    x = 0.0;
+    /** @type {number} */
+    y = 0.0;
+    /** @type {number} */
+    z = 0.0;
 
     static get ACTION_LEAVE_VEHICLE() {
         return 3
@@ -18,19 +29,6 @@ class InteractPacket extends DataPacket {
     static get ACTION_OPEN_INVENTORY() {
         return 6
     };
-
-    static getId() {
-        return ProtocolInfo.INTERACT_PACKET;
-    }
-
-    initVars() {
-        this.action = -1;
-        this.target = -1;
-
-        this.x = 0.0;
-        this.y = 0.0;
-        this.z = 0.0;
-    }
 
     _decodePayload() {
         this.action = this.readByte();

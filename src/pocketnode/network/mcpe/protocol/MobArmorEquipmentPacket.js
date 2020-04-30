@@ -2,29 +2,20 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class MobArmorEquipmentPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET;
     }
 
-    initVars() {
-        this.entityRuntimeId = -1;
+    /** @type {number} */
+    entityRuntimeId;
 
-        //this intentionally doesn't use an array because we don't want any implicit dependencies on internal order
-
-        this.head = null;
-        this.chest = null;
-        this.legs = null;
-        this.feet = null;
-    }
+    head = null;
+    chest = null;
+    legs = null;
+    feet = null;
 
     _decodePayload() {
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         this.head = this.readSlot();
         this.chest = this.readSlot();
         this.legs = this.readSlot();

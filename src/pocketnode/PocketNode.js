@@ -6,8 +6,6 @@ const Logger = require("./logger/Logger");
 const Server = require("./Server");
 const localizationManager = require("./localization/localizationManager");
 const Config = require("./utils/Config");
-const INT32_MIN = -0x80000000;
-const INT32_MAX = 0x7fffffff;
 
 function PocketNode(paths) {
     this.START_TIME = Date.now();

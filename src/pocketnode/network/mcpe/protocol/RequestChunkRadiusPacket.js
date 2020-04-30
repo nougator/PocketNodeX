@@ -6,9 +6,8 @@ class RequestChunkRadiusPacket extends DataPacket {
         return ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET;
     }
 
-    initVars() {
-        this.radius = 0;
-    }
+    /** @type {number} */
+    radius = 0;
 
     _decodePayload() {
         this.radius = this.readVarInt();

@@ -2,21 +2,16 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class CommandRequestPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.COMMAND_REQUEST_PACKET;
     }
 
-    initVars() {
-        this.command = "";
-        this.originData = null;
-        this.isInternal = false;
-    }
+    /** @type {string} */
+    command;
+    /** @type {any} */
+    originData;
+    /** @type {boolean} */
+    isInternal = false;
 
     _decodePayload() {
         this.command = this.readString();

@@ -6,9 +6,8 @@ class ChunkRadiusUpdatedPacket extends DataPacket {
         return ProtocolInfo.CHUNK_RADIUS_UPDATED_PACKET;
     }
 
-    initVars() {
-        this.radius = 0;
-    }
+    /** @type {number} */
+    radius;
 
     _decodePayload() {
         this.radius = this.readVarInt();

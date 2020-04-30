@@ -1,53 +1,68 @@
 const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
+const UUID = require("../../../utils/UUID");
+const Vector3 = require("../../../math/Vector3");
+const Item = require("../../../item/Item");
+
 class AddPlayerPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.ADD_PLAYER_PACKET;
     }
 
-    initVars() {
-        this.uuid = null;
-        this.username = "";
-        this.entityUniqueId = null; //TODO
-        this.entityRuntimeId = -1;
-        this.platformChatId = "";
-        this.position = new Vector3();
-        this.motion = new Vector3();
-        this.pitch = 0.0;
-        this.yaw = 0.0;
-        this.headYaw = null; //TODO
-        this.item = new Item();
-        this.metadata = [];
+    /** @type {UUID} */
+    uuid;
+    /** @type {string} */
+    username = "";
+    /** @type {number} */
+    entityUniqueId;
+    /** @type {number} */
+    entityRuntimeId;
+    /** @type {string} */
+    platformChatId = "";
+    /** @type {Vector3} */
+    position = new Vector3();
+    /** @type {Vector3} */
+    motion = new Vector3();
+    /** @type {number} */
+    pitch = 0.0;
+    /** @type {number} */
+    yaw = 0.0;
+    /** @type {null|number} */
+    headYaw = null; //TODO
+    /** @type {Item} */
+    item = new Item();
+    /** @type {any} */
+    metadata = [];
 
-        //TODO: adventure settings stuff
-        this.uvarint1 = 0;
-        this.uvarint2 = 0;
-        this.uvarint3 = 0;
-        this.uvarint4 = 0;
-        this.uvarint5 = 0;
+    //TODO: adventure settings stuff
+    /** @type {number} */
+    uvarint1 = 0;
+    /** @type {number} */
+    uvarint2 = 0;
+    /** @type {number} */
+    uvarint3 = 0;
+    /** @type {number} */
+    uvarint4 = 0;
+    /** @type {number} */
+    uvarint5 = 0;
 
-        this.long1 = 0;
+    /** @type {number} */
+    long1 = 0;
+    /** @type {any} */
+    links = [];
 
-        this.links = [];
-
-        this.deviceId = "" //TODO: fill player's device ID (???)
-    }
+    /** @type {string} */
+    deviceId = "" //TODO: fill player's device ID (???)
 
     _decodePayload() {
         this.uuid = this.readUUID();
         this.username = this.readString();
-        this.entityUniqueId = this.getEntityUniqueId();
-        this.entityRuntimeId = this.getEntityRuntimeId();
+        this.entityUniqueId = this.readEntityUniqueId();
+        this.entityRuntimeId = this.readEntityRuntimeId();
         this.platformChatId = this.readString();
-        this.position = this.getVector3Obj();
-        this.motion = this.getVector3Obj();
+        this.position = this.readVector3();
+        this.motion = this.readVector3();
         this.pitch = this.readLFloat();
         this.yaw = this.readLFloat();
         this.headYaw = this.readLFloat();

@@ -7,7 +7,6 @@ const EntityLink = require('./types/EntityLink');
 const Vector3 = require("../../../math/Vector3");
 
 class AddActorPacket extends DataPacket {
-
     static getId() {
         return ProtocolInfo.ADD_ACTOR_PACKET;
     }

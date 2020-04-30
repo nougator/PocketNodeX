@@ -2,23 +2,19 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class MobEquipmentPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.MOB_EQUIPMENT_PACKET;
     }
 
-    initVars() {
-        this.entityRuntimeId = -1;
-        this.item = null;
-        this.inventorySlot = -1;
-        this.hotbarSlot = -1;
-        this.windowId = 0;
-    }
+    /** @type {number} */
+    entityRuntimeId;
+    item = null;
+    /** @type {number} */
+    inventorySlot;
+    /** @type {number} */
+    hotbarSlot;
+    /** @type {number} */
+    windowId;
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

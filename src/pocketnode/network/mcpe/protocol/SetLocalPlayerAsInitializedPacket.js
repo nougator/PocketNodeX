@@ -2,18 +2,12 @@ const DataPacket = require("./DataPacket");
 const ProtocolInfo = require("../Info");
 
 class SetLocalPlayerAsInitializedPacket extends DataPacket {
-    constructor() {
-        super();
-        this.initVars();
-    }
-
     static getId() {
         return ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET;
     }
 
-    initVars() {
-        this.entityRuntimeId = -1;
-    }
+    /** @type {number} */
+    entityRuntimeId
 
     _decodePayload() {
         this.entityRuntimeId = this.readEntityRuntimeId();

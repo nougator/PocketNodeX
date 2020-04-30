@@ -5,13 +5,9 @@ const CommandEnum = require("./types/CommandEnum");
 const CommandData = require("./types/CommandData");
 const CommandParameter = require("./types/CommandParameter");
 
-const Isset = require("../../../utils/methods/Isset");
-
 class AvailableCommandsPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
     }
 
     /**
@@ -93,45 +89,38 @@ class AvailableCommandsPacket extends DataPacket {
         return 0x1000000
     };
 
-    static getId() {
-        return ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
-    }
-
-    initVars() {
-        /**
-         * @type {string[]}
-         * A list of every single enum value for every single command in the packet, including alias names.
-         */
-        this.enumValues = [];
-        /** @type {number} */
-        this.enumValuesCount = 0;
-        /**
-         * @type {string[]}
-         * A list of argument postfixes. Used for the /xp command's <int>L.
-         */
-        this.postfixes = [];
-
-        /**
-         * @type {CommandEnum[]}
-         * List of command enums, from command aliases to argument enums.
-         */
-        this.enums = [];
-        /**
-         * @type {{}} string => int map of enum name to index
-         */
-        this.enumMap = {};
-        /**
-         * @type {CommandData[]}
-         * List of command data, including name, description, alias indexes and parameters.
-         */
-        this.commandData = [];
-        /**
-         * @type {CommandEnum[]}
-         * List of dynamic command enums, also referred to as "soft" enums. These can by dynamically updated mid-game
-         * without resending this packet.
-         */
-        this.softEnums = [];
-    }
+    /**
+     * @type {string[]}
+     * A list of every single enum value for every single command in the packet, including alias names.
+     */
+    enumValues = [];
+    /** @type {number} */
+    enumValuesCount = 0;
+    /**
+     * @type {string[]}
+     * A list of argument postfixes. Used for the /xp command's <int>L.
+     */
+    postfixes = [];
+    /**
+     * @type {CommandEnum[]}
+     * List of command enums, from command aliases to argument enums.
+     */
+    enums = [];
+    /**
+     * @type {{}} string => int map of enum name to index
+     */
+    enumMap = {};
+    /**
+     * @type {CommandData[]}
+     * List of command data, including name, description, alias indexes and parameters.
+     */
+    commandData = [];
+    /**
+     * @type {CommandEnum[]}
+     * List of dynamic command enums, also referred to as "soft" enums. These can by dynamically updated mid-game
+     * without resending this packet.
+     */
+    softEnums = [];
 
     _decodePayload() {
         this.enumValuesCount = this.readUnsignedVarInt();

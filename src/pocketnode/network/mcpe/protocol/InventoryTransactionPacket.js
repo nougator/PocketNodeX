@@ -4,10 +4,8 @@ const ProtocolInfo = require("../Info");
 const NetworkInventoryAction = require("./types/NetworkInventoryAction");
 
 class InventoryTransactionPacket extends DataPacket {
-
-    constructor() {
-        super();
-        this.initVars();
+    static getId() {
+        return ProtocolInfo.INVENTORY_TRANSACTION_PACKET;
     }
 
     static get TYPE_NORMAL() {
@@ -57,30 +55,16 @@ class InventoryTransactionPacket extends DataPacket {
         return 1
     };
 
-    static getId() {
-        return ProtocolInfo.INVENTORY_TRANSACTION_PACKET;
-    }
-
-    initVars() {
-        this.transactionType = -1;
-
-        /**
-         * @type {boolean}
-         * NOTE: THIS FIELD DOES NOT EXIST IN THE PROTOCOL, it's merely used for convenience for PocketMine-MP to easily
-         * determine whether we're doing a crafting transaction.
-         */
-        this.isCraftingPart = false;
-        /**
-         * @type {boolean}
-         * NOTE: THIS FIELD DOES NOT EXIST IN THE PROTOCOL, it's merely used for convenience for PocketMine-MP to easily
-         * determine whether we're doing a crafting transaction.
-         */
-        this.isFinalCraftingPart = false;
-
-        this.actions = [];
-
-        this.trData = null;
-    }
+    /** @type {number} */
+    transactionType;
+    /** @type {boolean} */
+    isCraftingPart = false;
+    /** @type {boolean} */
+    isFinalCraftingPart = false;
+    /** @type {any} */
+    actions = [];
+    /** @type {any} */
+    trData = null;
 
     _decodePayload() {
         this.transactionType = this.readUnsignedVarInt();
