@@ -804,7 +804,7 @@ class Player extends Human {
 
         // this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
 
-        let ev = new PlayerJoinEvent(this, TextFormat.YELLOW + this.getName() + " Joined the game!");
+        let ev = new PlayerJoinEvent(this, TextFormat.YELLOW + this.getName() + " joined the game");
         this.server.getEventSystem().callEvent(ev);
         if (ev.getJoinMessage().length > 0) {
             this.server.broadcastMessage(ev.getJoinMessage());
