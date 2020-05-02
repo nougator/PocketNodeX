@@ -3,19 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="fae901bb-40a3-4b37-a599-b130e892034e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pocketnode/network/PlayerNetworkSessionAdapter.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pocketnode/network/PlayerNetworkSessionAdapter.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pocketnode/network/mcpe/NetworkBinaryStream.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pocketnode/network/mcpe/NetworkBinaryStream.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pocketnode/player/Player.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pocketnode/player/Player.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pocketnode/utils/UUID.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pocketnode/utils/UUID.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pocketnode/utils/methods/Globals.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pocketnode/utils/methods/Globals.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.json" beforeDir="false" afterPath="$PROJECT_DIR$/server.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pocketnode/utils/Config.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pocketnode/utils/Config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FavoritesManager">
-    <favorites_list name="PocketNode" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -42,26 +36,28 @@
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="editor.config.ad.shown" value="true" />
     <property name="javascript.nodejs.core.library.configured.version" value="12.13.1" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/start.js" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
+    <property name="nodejs_interpreter_path" value="$PROJECT_DIR$/../../../../Program Files/nodejs/node" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="discord-application" />
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 2019.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
   </component>
   <component name="RecentsManager">
@@ -80,18 +76,6 @@
     <configuration name="start.js" type="NodeJSConfigurationType" nameIsGenerated="true" path-to-js-file="start.js" working-dir="$PROJECT_DIR$">
       <method v="2" />
     </configuration>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -168,38 +152,17 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.js" />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="550" y="25" key="#Node.js_and_NPM" timestamp="1575404138913">
-      <screen x="0" y="0" width="1366" height="728" />
+    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1588242109232">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="550" y="25" key="#Node.js_and_NPM/0.0.1366.728@0.0.1366.728" timestamp="1575404138913" />
-    <state x="137" y="18" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1575404205133">
-      <screen x="0" y="0" width="1366" height="728" />
+    <state x="740" y="261" key="FileChooserDialogImpl/0.0.1920.1040/-1280.46.1280.984@0.0.1920.1040" timestamp="1588242109232" />
+    <state x="546" y="255" key="SettingsEditor" timestamp="1588242554850">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="137" y="18" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1366.728@0.0.1366.728" timestamp="1575404205133" />
-    <state x="463" y="118" key="FileChooserDialogImpl" timestamp="1575404203604">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state x="463" y="118" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1575404203604" />
-    <state width="661" height="177" key="GridCell.Tab.0.bottom" timestamp="1575414659366">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="661" height="177" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1575414659366" />
-    <state width="661" height="177" key="GridCell.Tab.0.center" timestamp="1575414659365">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="661" height="177" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1575414659365" />
-    <state width="661" height="177" key="GridCell.Tab.0.left" timestamp="1575414659365">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="661" height="177" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1575414659365" />
-    <state width="661" height="177" key="GridCell.Tab.0.right" timestamp="1575414659366">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state width="661" height="177" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1575414659366" />
-    <state x="184" y="6" key="SettingsEditor" timestamp="1575403725437">
-      <screen x="0" y="0" width="1366" height="728" />
-    </state>
-    <state x="184" y="6" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1575403725437" />
+    <state x="546" y="255" key="SettingsEditor/0.0.1920.1040/-1280.46.1280.984@0.0.1920.1040" timestamp="1588242554850" />
   </component>
 </project>

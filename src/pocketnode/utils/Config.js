@@ -1,13 +1,16 @@
 // TODO: return defaultConfiguration if not found
 const superagent = require("superagent");
 const fs = require('fs');
-const logger = require('../logger/Logger');
+
 
 const bannedIpsPath = "../../../banned-ips.json";
 const bannedNamesPath = "../../../banned-names.json";
 const opsPath = "../../../ops.json";
 const whitelistPath = "../../../whitelist.json";
+const resourcesPackPath = "../../../resource_packs/resource_packs.json";
+const pathList = [bannedIpsPath, bannedNamesPath, opsPath, whitelistPath, resourcesPack];
 
+pathList.forEach(() =>{});
 
 const confFile = require("../../../server.json");
 // const defaultConfig = require("./misc/defaultConfig.json");
@@ -46,9 +49,9 @@ class Config {
      */
     RWConf(category, mode, content) {
         if(!category) return;
-        if(mode != 'r' | 'w') return;
+        if(mode != "r" | "w") return;
 
-        if(mode == 'r') {
+        if(mode == "r") {
             switch(category) {
                 case "ops":
                     return ops;
@@ -60,7 +63,7 @@ class Config {
                     return bannedNames;
 
                 case "whitelist":
-                    return bannedNames;
+                    return whitelist;
                 
                 case "config":
                     return confData;

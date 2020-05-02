@@ -27,7 +27,6 @@
         "compressionLevel": 7
     },
     "misc": {
-        "debugModeLevel": 0,
-        "forceResourcesPack": false
+        "debugModeLevel": 0
     }
 }
