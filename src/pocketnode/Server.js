@@ -1,14 +1,11 @@
 const ProtocolInfo = require("./network/mcpe/Info");
 const Config = require("./utils/Config");
 
-const UUID = require('./utils/UUID');
 const SkinAdapterSingleton = require('./network/mcpe/protocol/types/SkinAdapterSingleton');
 
 const PluginManager = require("./plugin/PluginManager");
 const SourcePluginLoader = require("./plugin/SourcePluginLoader");
 const ScriptPluginLoader = require("./plugin/ScriptPluginLoader");
-
-const Isset = require("./utils/methods/Isset");
 
 const PlayerListPacket = require('./network/mcpe/protocol/PlayerListPacket');
 const PlayerListEntry = require('./network/mcpe/protocol/types/PlayerListEntry');
@@ -19,17 +16,10 @@ const RuntimeBlockMapping = require("./network/mcpe/protocol/types/RuntimeBlockM
 
 const CommandMap = require("./command/CommandMap");
 const ConsoleCommandReader = require("./command/ConsoleCommandReader");
-const HelpCommand = require("./command/defaults/HelpCommand");
-const StopCommand = require("./command/defaults/StopCommand");
-const VersionCommand = require("./command/defaults/VersionCommand");
-const PluginsCommand = require("./command/defaults/PluginsCommand");
-const TitleCommand = require("./command/defaults/TitleCommand");
 
 const Player = require("./player/Player");
 const PlayerList = require("./player/PlayerList");
 const Entity = require("./entity/Entity");
-
-const localizationManager = require("./localization/localizationManager");
 
 const ResourcePackManager = require("./resourcepacks/ResourcePackManager");
 
@@ -38,7 +28,6 @@ const GeneratorManager = require("./level/generator/GeneratorManager");
 const FlatGenerator = require("./level/generator/FlatGenerator");
 
 const EventHandler = require("./event/EventHandler");
-const TestEvent = require("./event/TestEvent");
 
 const SFS = require("./utils/SimpleFileSystem");
 
@@ -84,7 +73,7 @@ class Server {
 
         this.getLogger().setDebugging(this._debuggingLevel);
 
-        //this._scheduler
+        // this._scheduler
 
         this._ops = new Config(this.getDataPath() + "ops.json", Config.JSON);
         this._whitelist = new Config(this.getDataPath() + "whitelist.json", Config.JSON);
