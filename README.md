@@ -3,8 +3,9 @@
 ## What's This?
 PocketNodeX is a server software for Minecraft: Bedrock written in node.js, basically is based on PocketNode (a software discontinued based on PocketMine-MP).
 
-## Telegram
-[Click Here](https://t.me/PocketNodeX)
+## Talk with us
+[Telegram](https://t.me/PocketNodeX)
+[Discord](https://discord.gg/fGkHZhu)
 
 ## Some pictures
 ![Chunks](https://user-images.githubusercontent.com/34418030/63705464-7eec2700-c82d-11e9-8a3e-19fe78459816.png)
